@@ -203,7 +203,7 @@ Walk through how to address the recommendations surfaced in Act 2:
    - What can be **fixed in place** (e.g., portal toggle to enable zone redundancy)
    - What needs to be **redeployed via script or automation** (e.g., storage account LRS → ZRS conversion)
    - What requires **manual effort** (e.g., architecture changes, support requests)
-4. The user can also prompt the agent to generate an **IaC template** (Bicep/Terraform) with the right resiliency controls already enabled — ready to deploy or integrate into existing pipelines.
+4. The user can also prompt the agent to generate an **IaC template** (Bicep) with the right resiliency controls already enabled — ready to deploy or integrate into existing pipelines.
 
 > **Key talking point:** "Infrastructure Resiliency Manager doesn't just tell you what's wrong — Copilot walks you through each fix, categorizes the effort, and can even generate deployment-ready IaC templates with zone-redundancy baked in."
 
