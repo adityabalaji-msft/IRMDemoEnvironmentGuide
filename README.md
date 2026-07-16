@@ -1,8 +1,8 @@
-# Resiliency in Azure — Field Demo Guide
+# Infrastructure Resiliency Manager — Field Demo Guide
 
 > **Two sample applications deployed to Azure for demonstrating Infrastructure Resiliency Manager (IRM) capabilities to customers.**
 
-This repository contains the source code, infrastructure-as-code, and demo guide for two live applications designed to showcase the end-to-end journey of assessing, remediating, and validating zone resiliency using [Resiliency in Azure](https://github.com/Azure/ResiliencyInAzure).
+This repository contains the source code, infrastructure-as-code, and demo guide for two live applications designed to showcase the end-to-end journey of assessing, remediating, and validating zone resiliency using Infrastructure Resiliency Manager.
 
 ---
 
@@ -136,11 +136,11 @@ graph TB
 
 ---
 
-> **Key talking point for Act 1:** "The AKS app looks resilient on the surface — nodes are across zones. But what about the SQL database and storage it depends on? The VM app has ASR configured, so it *can* survive a zone outage — but can the customer actually orchestrate the recovery in the right order under pressure? Has it ever been tested? These are the questions Resiliency in Azure answers."
+> **Key talking point for Act 1:** "The AKS app looks resilient on the surface — nodes are across zones. But what about the SQL database and storage it depends on? The VM app has ASR configured, so it *can* survive a zone outage — but can the customer actually orchestrate the recovery in the right order under pressure? Has it ever been tested? These are the questions Infrastructure Resiliency Manager answers."
 
 ---
 
-### Act 2 — "Discover Your Posture at Scale" (Resiliency in Azure — Assessment)
+### Act 2 — "Discover Your Posture at Scale" (Infrastructure Resiliency Manager — Assessment)
 
 > **Pre-created service groups are ready for demo:**
 > | Service Group | App | What's configured |
@@ -150,7 +150,7 @@ graph TB
 
 #### Step 1: Start from the At-Scale View
 
-1. Open the [Resiliency portal](https://aka.ms/resiliencyInAzure/gatedPreview)
+1. Open the **Infrastructure Resiliency Manager** portal
 2. Navigate to **Resiliency → Resiliency Overview**
 3. Show the **at-scale summary** across all service groups:
    - Zone-resilient vs. non-resilient service groups
@@ -182,7 +182,7 @@ For each non-resilient resource, show:
 - Step-by-step remediation guidance
 - Copilot-powered **"Resolve"** feature that generates ready-to-run scripts
 
-> **Key talking point:** "Without this tool, you'd need to manually inspect each resource's zone configuration. With Resiliency in Azure, you get a single aggregated view, actionable recommendations with cost implications, and Copilot-generated remediation scripts."
+> **Key talking point:** "Without this tool, you'd need to manually inspect each resource's zone configuration. With Infrastructure Resiliency Manager, you get a single aggregated view, actionable recommendations with cost implications, and Copilot-generated remediation scripts."
 
 ---
 
@@ -204,7 +204,7 @@ Walk through how to address the recommendations surfaced in Act 2:
    - **Remediation Script** — ready-to-run PowerShell to enable ZR
    - **Inventory Table** — all affected resources
 
-> **Key talking point:** "Resiliency in Azure doesn't just tell you what's wrong — it generates scripts you can test and execute to fix it, with clear cost trade-offs so you can make informed decisions."
+> **Key talking point:** "Infrastructure Resiliency Manager doesn't just tell you what's wrong — it generates scripts you can test and execute to fix it, with clear cost trade-offs so you can make informed decisions."
 
 ---
 
