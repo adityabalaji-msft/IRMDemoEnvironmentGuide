@@ -1,0 +1,24 @@
+{
+  "name": "scenario6-vm-zonal",
+  "version": "1.0.0",
+  "description": "Zone-pinned VM service — single instance running frontend + backend on one VM",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "applicationinsights": "^3.0.0",
+    "@azure/identity": "^4.2.0",
+    "@azure/storage-blob": "^12.17.0",
+    "express": "^4.18.2",
+    "mssql": "^10.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

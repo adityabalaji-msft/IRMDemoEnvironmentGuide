@@ -1,0 +1,54 @@
+# =============================================================================
+# Scenario 4 — AKS ConfigMaps
+# =============================================================================
+# These ConfigMaps hold the dependency config for both frontend and backend.
+# 🎯 KEY SIGNAL: These are the config sources that a ZR tooling must inspect
+#    to discover the actual Azure resource endpoints used by the workloads.
+#    AKS control-plane API alone does NOT reveal these dependency values.
+#
+# The deploy script (scripts/deploy-scenario.sh 4) replaces the placeholder
+# values with real outputs from the Bicep deployment.
+# =============================================================================
+
+---
+# Backend ConfigMap: SQL connection info
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: default
+  labels:
+    scenario: scenario4-aks
+    service: backend
+    # ⚠️  ZR SIGNAL: This ConfigMap contains Azure SQL FQDN — must be updated on migration
+    zr-dependency-type: azure-sql
+data:
+  # Populated by deploy script from Bicep output: sql.outputs.sqlServerFqdn
+  SQL_SERVER: "zr-aks-yerto2m6texc4-sqlsvr.database.windows.net"
+  SQL_DATABASE: "zr-aks-db"
+  SQL_AUTH_TYPE: "entra"
+  AZURE_CLIENT_ID: "725de6c2-bf83-4981-bb11-8e240bcf8a66"
+  APP_ENV: "demo"
+  SCENARIO: "scenario4-aks-backend"
+
+---
+# Frontend ConfigMap: backend service URL + Storage endpoint
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: default
+  labels:
+    scenario: scenario4-aks
+    service: frontend
+    # ⚠️  ZR SIGNAL: Contains both internal K8s URL and external Azure Storage endpoint
+    zr-dependency-type: k8s-service_azure-storage
+data:
+  # Internal K8s service DNS — safe across AKS node replacements
+  BACKEND_URL: "http://backend-service.default.svc.cluster.local:8080"
+  # Populated by deploy script from Bicep output: storage.outputs.primaryEndpointBlob
+  STORAGE_ACCOUNT_URL: "https://zraksstoryerto2m6texc4.blob.core.windows.net/"
+  STORAGE_ACCOUNT_NAME: "zraksstoryerto2m6texc4"
+  STORAGE_ACCOUNT_KEY: "<REPLACE_WITH_STORAGE_KEY>"
+  APP_ENV: "demo"
+  SCENARIO: "scenario4-aks-frontend"

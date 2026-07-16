@@ -1,0 +1,23 @@
+{
+  "name": "scenario3-loyalty",
+  "version": "1.0.0",
+  "description": "Shared infra loyalty service — shares Front Door and Storage with checkout service",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "applicationinsights": "^3.0.0",
+    "@azure/storage-blob": "^12.17.0",
+    "express": "^4.18.2",
+    "mssql": "^10.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "demo" },
+    "baseName": { "value": "zr-vm-zonal" },
+    "vmZone": { "value": "1" },
+    "vmSize": { "value": "Standard_D2s_v3" },
+    "adminUsername": { "value": "azureuser" },
+    "entraAdminLogin": { "value": "REPLACE_WITH_ENTRA_ADMIN_UPN" },
+    "entraAdminObjectId": { "value": "REPLACE_WITH_ENTRA_ADMIN_OBJECT_ID" },
+    "sshPublicKey": { "value": "REPLACE_WITH_SSH_PUBLIC_KEY" }
+  }
+}
