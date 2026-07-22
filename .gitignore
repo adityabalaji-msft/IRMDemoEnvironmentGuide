@@ -2,3 +2,4 @@ node_modules/
 .env
 *.env.local
 deploy-vm.sh
+~$IRM-Field-Demo-Walking-Deck.pptx
