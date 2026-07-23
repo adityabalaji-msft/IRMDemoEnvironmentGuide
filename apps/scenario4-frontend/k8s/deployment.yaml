@@ -11,7 +11,7 @@ metadata:
     app: frontend
     scenario: scenario4-aks
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: frontend
@@ -21,11 +21,23 @@ spec:
         app: frontend
         scenario: scenario4-aks
     spec:
+      serviceAccountName: scenario4-sa
+      # Schedule workload pods on the user node pool
+      nodeSelector:
+        workload: app
+      # Ensure pods are spread across availability zones
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: frontend
       containers:
         - name: frontend
           # Replace with your ACR image: <registry>.azurecr.io/scenario4-frontend:latest
           image: zrdemoacr2.azurecr.io/scenario4-frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
@@ -64,6 +76,19 @@ spec:
               port: 8080
             initialDelaySeconds: 10
             periodSeconds: 10
+
+---
+# PodDisruptionBudget ensures at least 1 frontend pod stays running during disruptions
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: frontend
 
 ---
 apiVersion: v1

@@ -31,6 +31,43 @@ app.use(express.json());
 const PORT = process.env.PORT || 8080;
 const SCENARIO = 'scenario4-aks-backend';
 
+// --- Zone Discovery via K8s API ---
+const fs = require('fs');
+const https = require('https');
+let podZone = 'unknown';
+async function discoverZone() {
+  try {
+    const token = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/token', 'utf8');
+    const ca = fs.readFileSync('/var/run/secrets/kubernetes.io/serviceaccount/ca.crt');
+    const agent = new https.Agent({ ca });
+    const nodeName = process.env.NODE_NAME;
+    if (!nodeName) return;
+    const data = await new Promise((resolve) => {
+      const req = https.get(`https://kubernetes.default.svc/api/v1/nodes/${nodeName}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        agent,
+        timeout: 5000,
+      }, (res) => {
+        let body = '';
+        res.on('data', (chunk) => { body += chunk; });
+        res.on('end', () => {
+          try { resolve(JSON.parse(body)); } catch { resolve(null); }
+        });
+      });
+      req.on('error', () => resolve(null));
+      req.on('timeout', () => { req.destroy(); resolve(null); });
+    });
+    if (data?.metadata?.labels) {
+      podZone = data.metadata.labels['topology.kubernetes.io/zone'] || 'unknown';
+      console.log(`[zone-discovery] Node ${nodeName} is in zone: ${podZone}`);
+    }
+  } catch (err) {
+    console.warn(`[zone-discovery] Could not determine zone: ${err.message}`);
+  }
+}
+// Discover zone at startup (non-blocking)
+discoverZone();
+
 // Config arrives via K8s ConfigMap environment variables
 // Supports both SQL auth (password) and Entra-only auth (DefaultAzureCredential)
 const USE_ENTRA_AUTH = (process.env.SQL_AUTH_TYPE || '').toLowerCase() === 'entra';
@@ -79,6 +116,7 @@ app.get('/health', (req, res) => {
     scenario: SCENARIO,
     pod: process.env.POD_NAME || 'unknown',
     node: process.env.NODE_NAME || 'unknown',
+    zone: podZone,
     namespace: process.env.POD_NAMESPACE || 'unknown',
     timestamp: new Date().toISOString(),
     config: {

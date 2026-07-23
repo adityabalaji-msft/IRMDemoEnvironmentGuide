@@ -138,7 +138,7 @@ add_speaker_note(slide, """Agenda overview. Keep this brief — 30 seconds max.
 # ============================================================
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "Quick Reference — Demo Resources")
-add_body_text(slide, """AKS App URL:          http://irm-demo-aks.eastus.cloudapp.azure.com
+add_body_text(slide, """AKS App URL:          http://irm-demo-aks.westus2.cloudapp.azure.com
 VM App URL:           http://irm-demo-vm.westus2.cloudapp.azure.com:8080
 
 AKS Service Group:    IRMDemoSG2
@@ -187,7 +187,7 @@ Zone Resiliency Status:
   ✅  Container Registry (zone-redundant)
   ❌  Azure SQL Database (GP_Gen5_2 — no ZR)
   ❌  Storage Account (Standard_LRS — no ZR)""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → Open http://irm-demo-aks.eastus.cloudapp.azure.com")
+add_action_banner(slide, "▶  SWITCH TO BROWSER → Open http://irm-demo-aks.westus2.cloudapp.azure.com")
 
 add_speaker_note(slide, """Open the AKS app in browser. Show it's live.
 Key point: "The compute layer looks resilient — nodes across 3 zones. But look at the dependencies:
@@ -499,7 +499,7 @@ Validation:
 • End drill — nodes return, pods rebalance
 
 Expected result: ZERO downtime for the application""", font_size=Pt(18))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → Verify app at http://irm-demo-aks.eastus.cloudapp.azure.com")
+add_action_banner(slide, "▶  SWITCH TO BROWSER → Verify app at http://irm-demo-aks.westus2.cloudapp.azure.com")
 
 add_speaker_note(slide, """Execute the drill in portal (or show a pre-recorded execution if time-constrained).
 Switch to browser — refresh the app to show it's still serving.
@@ -651,7 +651,7 @@ slide = add_slide("", layout_idx=5)
 add_title_box(slide, "Appendix: Pre-Demo Checklist")
 add_body_text(slide, """Before presenting, verify:
 
-  □  AKS app is live: http://irm-demo-aks.eastus.cloudapp.azure.com
+  □  AKS app is live: http://irm-demo-aks.westus2.cloudapp.azure.com
   □  VM app is live: http://irm-demo-vm.westus2.cloudapp.azure.com:8080
   □  IRM portal loads and shows IRMDemoSG2 + IRMDemoSG3
   □  Pre-open browser tabs: both app URLs + IRM portal

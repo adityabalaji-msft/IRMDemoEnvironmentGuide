@@ -15,10 +15,16 @@ param kubernetesVersion string = '1.33'
 @description('VM size for the default node pool')
 param nodeVmSize string = 'Standard_DS2_v2'
 
-@description('Number of nodes in the default pool (use multiple of 3 for zone spread)')
+@description('Number of nodes in the system pool')
 param nodeCount int = 3
 
-@description('Enable zone redundancy for the node pool')
+@description('VM size for the user node pool')
+param userNodeVmSize string = 'Standard_DS2_v2'
+
+@description('Number of nodes in the user pool (use multiple of 3 for zone spread)')
+param userNodeCount int = 3
+
+@description('Enable zone redundancy for the node pools')
 param availabilityZones array = []
 
 @description('DNS prefix for the cluster')
@@ -41,7 +47,7 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-05-01' = {
     enableRBAC: true
     agentPoolProfiles: [
       {
-        name: 'default'
+        name: 'system'
         count: nodeCount
         vmSize: nodeVmSize
         osType: 'Linux'
@@ -49,6 +55,22 @@ resource aksCluster 'Microsoft.ContainerService/managedClusters@2023-05-01' = {
         availabilityZones: !empty(availabilityZones) ? availabilityZones : null
         enableAutoScaling: false
         type: 'VirtualMachineScaleSets'
+      }
+      {
+        name: 'userpool'
+        count: userNodeCount
+        vmSize: userNodeVmSize
+        osType: 'Linux'
+        mode: 'User'
+        availabilityZones: !empty(availabilityZones) ? availabilityZones : null
+        enableAutoScaling: true
+        minCount: 2
+        maxCount: 6
+        type: 'VirtualMachineScaleSets'
+        nodeTaints: []
+        nodeLabels: {
+          workload: 'app'
+        }
       }
     ]
     networkProfile: {

@@ -1,0 +1,45 @@
+# =============================================================================
+# Scenario 4 — RBAC for Zone-Aware Dashboard
+# =============================================================================
+# Grants pods permission to read node labels (for availability zone discovery)
+# and pod status (for zone distribution view on the frontend dashboard).
+# =============================================================================
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scenario4-sa
+  namespace: default
+  labels:
+    scenario: scenario4-aks
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: zone-reader
+  labels:
+    scenario: scenario4-aks
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: scenario4-zone-reader
+  labels:
+    scenario: scenario4-aks
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: zone-reader
+subjects:
+  - kind: ServiceAccount
+    name: scenario4-sa
+    namespace: default

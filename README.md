@@ -10,7 +10,7 @@ This repository contains the source code, infrastructure-as-code, and demo guide
 
 | Item | Value |
 |---|---|
-| **AKS App URL** | http://irm-demo-aks.eastus.cloudapp.azure.com |
+| **AKS App URL** | http://irm-demo-aks.westus2.cloudapp.azure.com |
 | **VM App URL** | http://irm-demo-vm.westus2.cloudapp.azure.com:8080 |
 | **AKS Service Group** | `IRMDemoSG2` |
 | **VM Service Group** | `IRMDemoSG3` |
@@ -29,7 +29,7 @@ Introduce both live apps by opening them in a browser. Explain what they do and 
 
 #### App A — E-Commerce Platform (AKS Microservices)
 
-**Live URL:** http://irm-demo-aks.eastus.cloudapp.azure.com
+**Live URL:** http://irm-demo-aks.westus2.cloudapp.azure.com
 
 A microservices e-commerce app with a **frontend** (product catalog, blob storage for static assets) calling a **backend API** (order processing via Azure SQL). Container images are pulled from Azure Container Registry. Deployed on AKS with 3 nodes spread across availability zones 1, 2, and 3.
 
@@ -226,7 +226,7 @@ The most impactful part of the demo — actually simulating a zone failure and v
 3. **Execute the drill** targeting Zone 1:
    - AKS node pool VMs in Zone 1 get shut down via Chaos Studio
    - The Load Balancer detects unhealthy nodes and routes traffic to zones 2 and 3
-4. **Open the app** at http://irm-demo-aks.eastus.cloudapp.azure.com — it continues serving because AKS has nodes in other zones. Frontend and backend pods reschedule automatically.
+4. **Open the app** at http://irm-demo-aks.westus2.cloudapp.azure.com — it continues serving because AKS has nodes in other zones. Frontend and backend pods reschedule automatically.
 5. **Monitor metrics** during the drill — view per-resource health in the drill execution job
 6. **End the drill** — nodes come back, pods rebalance across all zones
 
