@@ -78,6 +78,29 @@ graph TB
 
 **What it demonstrates:** The AKS compute layer *looks* resilient — nodes are spread across zones. But the backend dependencies (SQL, Storage) are not zone-redundant. A zone failure could keep compute alive while data services become unreachable.
 
+##### Web App Features (AKS E-Commerce App)
+
+The AKS frontend app includes built-in functionality designed for drill demonstrations:
+
+| Feature | Access | Description |
+|---|---|---|
+| **Product Catalog** | Main page | Fully functional e-commerce storefront with add-to-cart and checkout |
+| **Status Bar** | Top of page (always visible) | Real-time health indicators for Backend API, Blob Storage, and Azure SQL. Shows the serving zone. |
+| **Infrastructure Panel** | Click "⚙ Infrastructure" in navbar | Full cluster visibility: zone distribution, pod table, dependency status |
+| **Zone Distribution** | Infrastructure panel | Live 3-zone grid showing healthy/degraded/down/cordoned states per zone (auto-refreshes every 5s) |
+| **Activity Log** | Infrastructure panel (bottom) | Persistent, timestamped log of all zone/pod/node state changes. Survives browser refresh (localStorage). |
+
+**Activity Log captures during a drill:**
+- Zone going down (all pods NOT READY)
+- Node cordoned events
+- Pod terminations and rescheduling to healthy zones
+- Failover detection (traffic sustained on new zone for 3+ consecutive polls)
+- Zone recovery when drill ends
+- Pods scaling back up
+
+**CSA Tip — Pre-Execute the Drill:**
+The CSA can run the AKS drill (IRMDemoSG2) **before** the customer meeting. Open the web app in a browser tab and keep it open during drill execution. The Activity Log will record the entire drill timeline. During the customer demo, simply open the Infrastructure panel and walk through the Activity Log as evidence of zone resilience — no live waiting required.
+
 ---
 
 #### App B — Inventory Management System (VM-based with ASR)
@@ -219,6 +242,16 @@ The most impactful part of the demo — actually simulating a zone failure and v
 
 **Goal:** Prove that the AKS compute layer survives a zone failure.
 
+> **💡 Recommended:** CSA can execute this drill **before** the customer demo (~30 min ahead). The web app's Activity Log captures the full drill timeline in the browser, providing ready-made evidence to walk through during the meeting.
+
+**Pre-Demo Drill Execution (Recommended):**
+1. Open the AKS app at http://irm-demo-aks.westus2.cloudapp.azure.com
+2. Click "⚙ Infrastructure" in the navbar to open the Infrastructure panel
+3. Navigate to **IRMDemoSG2 → Resiliency → Drills** in the IRM portal and execute the drill
+4. Watch the Activity Log populate in real-time as zones go down and pods reschedule
+5. During the customer demo, open the same browser tab → Infrastructure → Activity Log
+
+**Live Demo Steps (if executing during the meeting):**
 1. Navigate to **IRMDemoSG2 → Resiliency → Drills** (drill already created)
 2. In the **Fault Designer**, note that:
    - ✅ **AKS Cluster** is included for fault injection (node shutdown in target zone)
@@ -227,10 +260,11 @@ The most impactful part of the demo — actually simulating a zone failure and v
    - AKS node pool VMs in Zone 1 get shut down via Chaos Studio
    - The Load Balancer detects unhealthy nodes and routes traffic to zones 2 and 3
 4. **Open the app** at http://irm-demo-aks.westus2.cloudapp.azure.com — it continues serving because AKS has nodes in other zones. Frontend and backend pods reschedule automatically.
-5. **Monitor metrics** during the drill — view per-resource health in the drill execution job
-6. **End the drill** — nodes come back, pods rebalance across all zones
+5. **Show the Activity Log** — click "⚙ Infrastructure" in the web app to see the timestamped record of zone down, pod termination, rescheduling, and failover detection
+6. **Monitor metrics** during the drill — view per-resource health in the drill execution job
+7. **End the drill** — nodes come back, pods rebalance across all zones (Activity Log records the recovery)
 
-> **Key talking point:** "We excluded the non-resilient SQL DB and focused on validating what we know should survive. The app stayed up because AKS compute is zone-redundant. Next step: make SQL zone-redundant too, then run the full drill."
+> **Key talking point:** "We excluded the non-resilient SQL DB and focused on validating what we know should survive. The app stayed up because AKS compute is zone-redundant. The Activity Log in the web app gives us a complete audit trail of exactly what happened — zone down, failover, recovery. Next step: make SQL zone-redundant too, then run the full drill."
 
 ---
 

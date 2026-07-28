@@ -457,7 +457,41 @@ We're going to simulate an actual zone failure and prove our apps survive."
 Build anticipation — this is the 'wow' moment.""")
 
 # ============================================================
-# SLIDE 18: Act 4a — AKS Drill Setup
+# SLIDE 18: Act 4a — CSA Pre-Demo Drill Option
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "CSA Option: Execute AKS Drill Before the Demo")
+add_body_text(slide, """Recommended: Run the AKS drill BEFORE the customer meeting
+
+Why?
+  • Avoids live wait times during the demo (drills take minutes)
+  • The web app's Activity Log captures the full drill timeline
+  • You walk into the meeting with proof already recorded
+
+Steps:
+  1. Navigate to IRMDemoSG2 → Resiliency → Drills
+  2. Execute the drill targeting Zone 1
+  3. Wait for completion (~5-10 min)
+  4. Open the web app → click "Infrastructure" button
+  5. The Activity Log shows: zone down → failover → recovery
+
+During the demo:
+  • Open the app and switch to Infrastructure panel
+  • Scroll through the Activity Log — it persists in the browser
+  • "Here's what happened when we simulated a zone failure earlier"
+
+Note: The Activity Log uses browser localStorage — use the same
+browser session you used to observe the drill.""", font_size=Pt(16))
+add_action_banner(slide, "▶  PRE-DEMO: Execute drill, then show Activity Log during customer meeting")
+
+add_speaker_note(slide, """This is the recommended approach for time-constrained demos.
+Run the drill 30 minutes before the meeting.
+Open the AKS app in browser and watch the Infrastructure panel during the drill.
+The Activity Log records all zone/pod/node state changes.
+When you present, just open the same browser tab — the log persists.""")
+
+# ============================================================
+# SLIDE 19: Act 4a — AKS Drill Setup
 # ============================================================
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "Drill: AKS App (IRMDemoSG2)")
@@ -482,7 +516,7 @@ Point out which resources are in scope and which are excluded.
 Explain the philosophy: validate what should work, exclude known gaps.""")
 
 # ============================================================
-# SLIDE 19: Act 4a — AKS Drill Execution
+# SLIDE 20: Act 4a — AKS Drill Execution
 # ============================================================
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "AKS Drill — Execution & Validation")
@@ -495,14 +529,21 @@ add_body_text(slide, """Execute the drill targeting Zone 1:
 
 Validation:
 • Open app URL — it continues serving ✅
+• Click "Infrastructure" in the web app navbar
+• Show the Activity Log — real-time timeline of:
+    - Zone going down, pods terminated, failover detected
+    - Pods rescheduling to healthy zones
+    - Zone recovery after drill ends
 • Monitor per-resource health in drill execution job
 • End drill — nodes return, pods rebalance
 
-Expected result: ZERO downtime for the application""", font_size=Pt(18))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → Verify app at http://irm-demo-aks.westus2.cloudapp.azure.com")
+Expected result: ZERO downtime for the application""", font_size=Pt(17))
+add_action_banner(slide, "▶  SWITCH TO BROWSER → App URL → Infrastructure panel → Activity Log")
 
 add_speaker_note(slide, """Execute the drill in portal (or show a pre-recorded execution if time-constrained).
-Switch to browser — refresh the app to show it's still serving.
+Switch to browser — show the Infrastructure panel in the web app.
+The Activity Log provides a timestamped record of every zone/pod change.
+This is the 'proof' — the customer can see exactly what happened during the zone failure.
 "The app stayed up because AKS has nodes in other zones. The LB handled rerouting automatically."
 Back to portal to show drill metrics/results.""")
 
@@ -658,6 +699,12 @@ add_body_text(slide, """Before presenting, verify:
   □  ASR replication is healthy (portal → Recovery Services vault)
   □  Drill definitions exist in both service groups
 
+Optional — Execute AKS drill ahead of time:
+  □  Run drill on IRMDemoSG2 (Zone 1 fault) ~30 min before demo
+  □  Keep the AKS app browser tab open during drill execution
+  □  Verify Activity Log captured the drill events (Infrastructure panel)
+  □  During demo: open Infrastructure → show Activity Log as evidence
+
 If AKS app is down:
   • Check: az aks get-credentials + kubectl get pods
   • Pods may need restart after a previous drill
@@ -667,7 +714,9 @@ If VM app is down:
   • May need to restart the scenario6 systemd service""", font_size=Pt(16))
 
 add_speaker_note(slide, """Hidden slide for presenter prep only. Don't show this during the demo.
-Run through this checklist 30 minutes before your session.""")
+Run through this checklist 30 minutes before your session.
+The AKS drill pre-execution is RECOMMENDED — the Activity Log in the web app
+provides compelling proof of zone resilience without waiting during the live demo.""")
 
 # Save
 output_path = "IRM-Field-Demo-Walking-Deck.pptx"
