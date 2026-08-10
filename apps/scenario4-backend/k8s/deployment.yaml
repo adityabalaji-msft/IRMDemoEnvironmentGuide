@@ -99,7 +99,7 @@ metadata:
   name: backend-pdb
   namespace: default
 spec:
-  minAvailable: 1
+  minAvailable: 0
   selector:
     matchLabels:
       app: backend

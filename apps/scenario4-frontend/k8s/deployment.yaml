@@ -85,7 +85,7 @@ metadata:
   name: frontend-pdb
   namespace: default
 spec:
-  minAvailable: 1
+  minAvailable: 0
   selector:
     matchLabels:
       app: frontend

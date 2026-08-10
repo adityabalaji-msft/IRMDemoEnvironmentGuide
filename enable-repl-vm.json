@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "policyId": "/Subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-rg/providers/Microsoft.RecoveryServices/vaults/zr-vm-asr-rsv/replicationPolicies/zr-vm-asr-repl-policy",
+    "providerSpecificDetails": {
+      "recoveryResourceGroupId": "/subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-rg",
+      "vmManagedDisks": [
+        {
+          "diskId": "/subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-recovery-rg/providers/Microsoft.Compute/disks/zr-vm-asr-vm_OsDisk_1_99599685c57a4e389d2a184ca7de7bb7",
+          "recoveryResourceGroupId": "/subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-rg",
+          "recoveryReplicaDiskAccountType": "Standard_LRS",
+          "recoveryTargetDiskAccountType": "Standard_LRS",
+          "primaryStagingAzureStorageAccountId": "/subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-rg/providers/Microsoft.Storage/storageAccounts/asrcachekizw2c7qgyu7w"
+        }
+      ],
+      "fabricObjectId": "/subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-recovery-rg/providers/Microsoft.Compute/virtualMachines/zr-vm-asr-vm",
+      "recoveryAvailabilityZone": "1",
+      "instanceType": "A2A",
+      "recoveryContainerId": "/Subscriptions/c3d3eb0c-9ba7-4d4c-828e-cb6874714034/resourceGroups/zr-demo-vm-asr-rg/providers/Microsoft.RecoveryServices/vaults/zr-vm-asr-rsv/replicationFabrics/westus2-fabric/replicationProtectionContainers/westus2-source-container",
+      "multiVmGroupName": "scenario6-asr-group"
+    }
+  }
+}

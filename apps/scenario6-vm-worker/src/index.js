@@ -14,9 +14,36 @@ const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 8081;
-const VM_ZONE = process.env.VM_ZONE || 'unknown';
+let VM_ZONE = process.env.VM_ZONE || 'unknown';
 const VM_NAME = process.env.VM_NAME || os.hostname();
 const WORKER_ROLE = 'data-sync-agent';
+
+// --- IMDS Zone Detection (ASR failover support) ---
+async function refreshZoneFromIMDS() {
+  try {
+    const http = require('http');
+    const zone = await new Promise((resolve, reject) => {
+      const req = http.get(
+        'http://169.254.169.254/metadata/instance/compute/zone?api-version=2021-02-01&format=text',
+        { headers: { 'Metadata': 'true' }, timeout: 2000 },
+        (resp) => {
+          let data = '';
+          resp.on('data', chunk => data += chunk);
+          resp.on('end', () => resolve(data.trim()));
+        }
+      );
+      req.on('error', () => resolve(null));
+      req.on('timeout', () => { req.destroy(); resolve(null); });
+    });
+    if (zone && zone !== '') {
+      VM_ZONE = zone;
+      console.log(`[IMDS] Detected zone: ${VM_ZONE}`);
+    }
+  } catch {
+    // IMDS not available — keep env var value
+  }
+}
+refreshZoneFromIMDS();
 
 // --- Simulated work state ---
 let syncState = {

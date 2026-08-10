@@ -60,7 +60,84 @@ SERVICE
 # Create empty .env (will be populated by deploy script)
 touch /opt/scenario6-vm-zonal/.env
 
+# =============================================================================
+# ASR Failover Support: Auto-refresh .env on every boot
+# =============================================================================
+# After ASR failover, the VM may be in a different zone with new IPs.
+# This script runs before the app and refreshes dynamic config from IMDS.
+
+cat > /opt/scenario6-vm-zonal/refresh-env.sh << 'ENVSCRIPT'
+#!/bin/bash
+# Refresh environment variables from Azure IMDS on each boot
+# Ensures correct config after ASR zone-to-zone failover
+
+ENV_FILE="/opt/scenario6-vm-zonal/.env"
+
+# Wait for IMDS to be available (may take a moment after failover boot)
+for i in $(seq 1 30); do
+  if curl -s -f -H "Metadata:true" --connect-timeout 2 "http://169.254.169.254/metadata/instance?api-version=2021-02-01" > /dev/null 2>&1; then
+    break
+  fi
+  sleep 2
+done
+
+# Get current zone from IMDS
+CURRENT_ZONE=$(curl -s -H "Metadata:true" "http://169.254.169.254/metadata/instance/compute/zone?api-version=2021-02-01&format=text" 2>/dev/null || echo "unknown")
+
+# Get VM name from IMDS
+CURRENT_VM=$(curl -s -H "Metadata:true" "http://169.254.169.254/metadata/instance/compute/name?api-version=2021-02-01&format=text" 2>/dev/null || echo "unknown")
+
+if [ -f "$ENV_FILE" ]; then
+  # Update VM_ZONE with actual zone from IMDS
+  if grep -q "^VM_ZONE=" "$ENV_FILE"; then
+    sed -i "s/^VM_ZONE=.*/VM_ZONE=${CURRENT_ZONE}/" "$ENV_FILE"
+  else
+    echo "VM_ZONE=${CURRENT_ZONE}" >> "$ENV_FILE"
+  fi
+
+  # Update VM_NAME with actual VM name from IMDS
+  if grep -q "^VM_NAME=" "$ENV_FILE"; then
+    sed -i "s/^VM_NAME=.*/VM_NAME=${CURRENT_VM}/" "$ENV_FILE"
+  else
+    echo "VM_NAME=${CURRENT_VM}" >> "$ENV_FILE"
+  fi
+
+  # Update WORKER_VM_URL to use Private DNS hostname (survives failover)
+  WORKER_DNS="http://zr-vm-zonal-worker.scenario6.internal:8081"
+  if grep -q "^WORKER_VM_URL=" "$ENV_FILE"; then
+    sed -i "s|^WORKER_VM_URL=.*|WORKER_VM_URL=${WORKER_DNS}|" "$ENV_FILE"
+  else
+    echo "WORKER_VM_URL=${WORKER_DNS}" >> "$ENV_FILE"
+  fi
+
+  echo "[env-refresh] Updated .env: VM_ZONE=${CURRENT_ZONE}, VM_NAME=${CURRENT_VM}, WORKER_VM_URL=${WORKER_DNS}"
+else
+  echo "[env-refresh] WARNING: ${ENV_FILE} not found"
+fi
+ENVSCRIPT
+chmod +x /opt/scenario6-vm-zonal/refresh-env.sh
+
+# Systemd service: runs on every boot BEFORE the app to refresh config
+cat > /etc/systemd/system/scenario6-env-refresh.service << 'REFRESHSVC'
+[Unit]
+Description=Refresh Scenario 6 env from IMDS (ASR failover support)
+Before=scenario6.service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scenario6-vm-zonal/refresh-env.sh
+RemainAfterExit=true
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+REFRESHSVC
+
 systemctl daemon-reload
+systemctl enable scenario6-env-refresh.service
 systemctl enable scenario6.service
 
 echo "[INFO] Scenario 6 VM setup complete. Deploy app code and .env, then: systemctl start scenario6"

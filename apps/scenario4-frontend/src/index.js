@@ -361,7 +361,12 @@ app.get('/', async (req, res) => {
 
     <h3 style="color:#58a6ff; margin-bottom:1rem;">Availability Zone Distribution <span style="font-size:0.75rem;color:#8b949e;font-weight:normal">(auto-refreshes every 5s)</span></h3>
     <div id="zone-data"><div style="text-align:center;color:#8b949e;padding:2rem;">Loading zone status...</div></div>
-    <div class="zone-event-log" id="zone-log"></div>
+
+    <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="color:#58a6ff;">Activity Log <span style="font-size:0.75rem;color:#8b949e;font-weight:normal">(persisted in browser)</span></h3>
+      <button onclick="clearActivityLog()" style="background:transparent;border:1px solid #30363d;color:#8b949e;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:0.75rem;">Clear Log</button>
+    </div>
+    <div class="zone-event-log" id="zone-log" style="max-height:240px;"></div>
   </div>
 
   <!-- Toast -->
@@ -529,24 +534,106 @@ app.get('/', async (req, res) => {
       }
     }
 
-    // --- Zone Status (Infrastructure Panel) ---
+    // --- Zone Status (Infrastructure Panel) with Persistent Activity Log ---
     const allZones = ['westus2-1', 'westus2-2', 'westus2-3'];
-    let previousZones = {};
-    const eventLog = [];
+    let previousState = JSON.parse(localStorage.getItem('zr_prev_state') || 'null');
+    let activityLog = JSON.parse(localStorage.getItem('zr_activity_log') || '[]');
+    let zoneShiftCount = 0;
+    let zoneShiftTarget = null;
 
     function addEvent(msg, level) {
-      const ts = new Date().toLocaleTimeString();
-      eventLog.unshift({ ts, msg, level });
-      if (eventLog.length > 50) eventLog.pop();
+      const now = new Date();
+      const ts = now.toLocaleDateString('en-US', {month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString();
+      activityLog.unshift({ ts, msg, level, epoch: now.getTime() });
+      if (activityLog.length > 200) activityLog = activityLog.slice(0, 200);
+      localStorage.setItem('zr_activity_log', JSON.stringify(activityLog));
+      renderLog();
+    }
+
+    function clearActivityLog() {
+      activityLog = [];
+      localStorage.removeItem('zr_activity_log');
+      localStorage.removeItem('zr_prev_state');
+      previousState = null;
       renderLog();
     }
 
     function renderLog() {
       const el = document.getElementById('zone-log');
       if (!el) return;
-      el.innerHTML = eventLog.map(e =>
+      if (activityLog.length === 0) { el.innerHTML = '<div style="color:#8b949e;padding:0.5rem;">No events recorded yet. Events will appear as zone/pod/node state changes are detected.</div>'; return; }
+      el.innerHTML = activityLog.map(e =>
         '<div class="event ' + e.level + '">[' + e.ts + '] ' + e.msg + '</div>'
       ).join('');
+    }
+
+    function detectChanges(data) {
+      if (!previousState) {
+        // First load — record initial state
+        const zones = Object.keys(data.zoneSummary);
+        if (zones.length > 0) {
+          addEvent('Initial state: ' + zones.map(z => z.replace('westus2-','Z') + '=' + data.zoneSummary[z].ready + ' ready').join(', '), 'ok');
+        }
+        previousState = buildState(data);
+        localStorage.setItem('zr_prev_state', JSON.stringify(previousState));
+        return;
+      }
+
+      const curr = buildState(data);
+
+      // Detect zone-level changes
+      for (const z of allZones) {
+        const prev = previousState.zones[z];
+        const now = curr.zones[z];
+        if (!prev && now && now.ready > 0) addEvent('Zone ' + z.replace('westus2-','') + ': came online with ' + now.ready + ' ready pod(s)', 'ok');
+        else if (prev && !now) addEvent('Zone ' + z.replace('westus2-','') + ': all pods removed — zone empty', 'warn');
+        else if (prev && now) {
+          if (prev.ready > 0 && now.ready === 0 && now.total > 0) addEvent('Zone ' + z.replace('westus2-','') + ': all pods NOT READY (' + now.total + ' pending/failed)', 'error');
+          else if (prev.ready === 0 && now.ready > 0) addEvent('Zone ' + z.replace('westus2-','') + ': recovered — ' + now.ready + ' pod(s) now ready', 'ok');
+          if (!prev.cordoned && now.cordoned) addEvent('Zone ' + z.replace('westus2-','') + ': node CORDONED — drain in progress', 'error');
+          else if (prev.cordoned && !now.cordoned) addEvent('Zone ' + z.replace('westus2-','') + ': node UNCORDONED — accepting workloads again', 'ok');
+          if (prev.ready !== now.ready || prev.total !== now.total) {
+            if (prev.total < now.total) addEvent('Zone ' + z.replace('westus2-','') + ': pods scaled up (' + prev.total + ' \\u2192 ' + now.total + ')', 'ok');
+            else if (prev.total > now.total) addEvent('Zone ' + z.replace('westus2-','') + ': pods reduced (' + prev.total + ' \\u2192 ' + now.total + ')', 'warn');
+          }
+        }
+      }
+
+      // Detect pod-level changes (new pods, terminated pods)
+      for (const svc of ['frontend', 'backend']) {
+        const prevPods = new Set(previousState.pods[svc] || []);
+        const currPods = new Set(curr.pods[svc] || []);
+        for (const p of currPods) { if (!prevPods.has(p)) addEvent(svc + ': new pod ' + p.substring(0,24) + ' scheduled', 'ok'); }
+        for (const p of prevPods) { if (!currPods.has(p)) addEvent(svc + ': pod ' + p.substring(0,24) + ' terminated', 'warn'); }
+      }
+
+      // Detect sustained zone failover (only log after 3 consecutive polls in a new zone)
+      if (previousState.servingZone && curr.servingZone && previousState.servingZone !== curr.servingZone) {
+        zoneShiftCount++;
+        zoneShiftTarget = curr.servingZone;
+      } else if (curr.servingZone === zoneShiftTarget && zoneShiftCount > 0) {
+        zoneShiftCount++;
+      } else {
+        zoneShiftCount = 0;
+        zoneShiftTarget = null;
+      }
+      if (zoneShiftCount === 3 && zoneShiftTarget) {
+        addEvent('FAILOVER detected: traffic sustained on ' + zoneShiftTarget.replace('westus2-','Zone ') + ' (3 consecutive polls)', 'error');
+        zoneShiftCount = 0;
+      }
+
+      previousState = curr;
+      localStorage.setItem('zr_prev_state', JSON.stringify(previousState));
+    }
+
+    function buildState(data) {
+      const zones = {};
+      for (const z of allZones) {
+        const info = data.zoneSummary[z];
+        if (info) zones[z] = { ready: info.ready, total: info.total, cordoned: info.nodeUnschedulable };
+      }
+      const pods = { frontend: (data.frontend||[]).map(p => p.name), backend: (data.backend||[]).map(p => p.name) };
+      return { zones, pods, servingPod: data.thisInstance?.pod, servingZone: data.thisInstance?.zone };
     }
 
     async function refreshZoneStatus() {
@@ -555,16 +642,8 @@ app.get('/', async (req, res) => {
         const data = await r.json();
         if (data.error) { document.getElementById('zone-data').innerHTML = '<div style="text-align:center;color:#8b949e;padding:2rem;">&#9888; ' + data.error + '</div>'; return; }
 
-        // Detect zone changes
-        for (const z of allZones) {
-          const cur = data.zoneSummary[z];
-          const prev = previousZones[z];
-          if (prev && cur && prev.ready > 0 && cur.ready === 0) addEvent('Zone ' + z + ' lost all ready pods!', 'error');
-          else if (prev && cur && prev.ready === 0 && cur.ready > 0) addEvent('Zone ' + z + ' recovered', 'ok');
-          else if (!prev && cur && cur.ready > 0) addEvent('Zone ' + z + ' now has ' + cur.ready + ' pod(s)', 'ok');
-          else if (prev && !cur) addEvent('Zone ' + z + ' drained', 'warn');
-        }
-        previousZones = JSON.parse(JSON.stringify(data.zoneSummary));
+        // Detect and log changes
+        detectChanges(data);
 
         let html = '<div class="zone-grid">';
         for (const z of allZones) {
@@ -603,8 +682,10 @@ app.get('/', async (req, res) => {
     // --- Init ---
     renderProducts('all');
     checkHealth();
+    renderLog();
+    refreshZoneStatus();
     setInterval(checkHealth, 15000);
-    setInterval(() => { if (document.getElementById('infra-panel').classList.contains('open')) refreshZoneStatus(); }, 5000);
+    setInterval(refreshZoneStatus, 5000);
   </script>
 </body>
 </html>`);

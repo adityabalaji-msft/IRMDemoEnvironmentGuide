@@ -1,0 +1,42 @@
+{
+  "parameters": {
+    "targetZone": {
+      "value": "2"
+    },
+    "deploySql": {
+      "value": false
+    },
+    "environment": {
+      "value": "demo"
+    },
+    "entraAdminLogin": {
+      "value": "adbalaji@microsoft.com"
+    },
+    "existingSqlFqdn": {
+      "value": "zr-vm-asr-ydrrjg2o6aqq2.database.windows.net"
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "entraAdminObjectId": {
+      "value": "b84857dd-a5d0-4041-8629-7ae80ff1b3dd"
+    },
+    "baseName": {
+      "value": "zr-vm-asr"
+    },
+    "sshPublicKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDI9fXAqpKtL+utoOrMcTDYnwcX1c/PpGKa8RnZQLcABPh5rGA/32ZcRuhhkrVqYyy3znazA0hTAFR0WULO9ZD71muYuLQA55YpW5KUuGQhQ16y/OXI7K3mO9YJ+Lsh++f9HkV+Vsyjg4tSZANCt/QwePplq0D54worvH1Ab2+jPFalsvbF3fXdDHIASCoXe6K4ftREOe6qdY3C9Xf7YVRipErzJoNsCmd21jSpb1/3oM2c3gnUdkGzuIiHJdgTJm0FX54RfUF5jpUQO0djl0aHKvQLeZUVl1AhDnoLhxVXlHyvARUzcEcrlvOWG6HtcL94/QGRy+IOPbSV/z3av8OB"
+    },
+    "sourceZone": {
+      "value": "1"
+    },
+    "existingSqlDatabase": {
+      "value": "zr-vm-asr-db"
+    }
+  },
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0"
+}

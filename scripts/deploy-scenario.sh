@@ -164,8 +164,16 @@ case "$SCENARIO" in
     echo "==============================================================="
     exit 0
     ;;
+  6)
+    SCENARIO_DIR="infra/scenario6-vm-zonal"
+    BASE_NAME="zr-vm-zonal"
+    ;;
+  6-asr)
+    SCENARIO_DIR="infra/scenario6-vm-asr"
+    BASE_NAME="zr-vm-asr"
+    ;;
   *)
-    echo "Invalid scenario: $SCENARIO. Must be 1-5 or 4-local."
+    echo "Invalid scenario: $SCENARIO. Must be 1-6, 4-local, or 6-asr."
     exit 1
     ;;
 esac
@@ -239,6 +247,13 @@ if [[ "$SCENARIO" == "4" ]]; then
   echo "       kubectl apply -f apps/scenario4-backend/k8s/configmap.yaml"
   echo "       kubectl apply -f apps/scenario4-backend/k8s/deployment.yaml"
   echo "       kubectl apply -f apps/scenario4-frontend/k8s/deployment.yaml"
+fi
+
+if [[ "$SCENARIO" == "6-asr" ]]; then
+  echo "[INFO] Enabling ASR zone-to-zone replication for Scenario 6-ASR VMs..."
+  echo "[INFO] Waiting 60s for VMs to fully provision before enabling replication..."
+  sleep 60
+  bash scripts/enable-asr-replication.sh "$RESOURCE_GROUP" "$LOCATION"
 fi
 
 echo

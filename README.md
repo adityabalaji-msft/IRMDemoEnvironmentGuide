@@ -11,11 +11,11 @@ This repository contains the source code, infrastructure-as-code, and demo guide
 | Item | Value |
 |---|---|
 | **AKS App URL** | http://irm-demo-aks.westus2.cloudapp.azure.com |
-| **VM App URL** | http://irm-demo-vm.westus2.cloudapp.azure.com:8080 |
-| **AKS Service Group** | `IRMDemoSG2` |
-| **VM Service Group** | `IRMDemoSG3` |
+| **VM App URL** | http://zr-inventory-asr.westus2.cloudapp.azure.com:8080 |
+| **AKS Service Group** | `IRMDemoSG5` |
+| **VM Service Group** | `IRMDemoSG8` |
 | **AKS Resource Group** | `zr-demo-rg-4` |
-| **VM Resource Group** | `zr-demo-vm-rg` |
+| **VM Resource Group** | `zr-demo-vm-asr-rg` |
 
 ---
 
@@ -99,13 +99,13 @@ The AKS frontend app includes built-in functionality designed for drill demonstr
 - Pods scaling back up
 
 **CSA Tip — Pre-Execute the Drill:**
-The CSA can run the AKS drill (IRMDemoSG2) **before** the customer meeting. Open the web app in a browser tab and keep it open during drill execution. The Activity Log will record the entire drill timeline. During the customer demo, simply open the Infrastructure panel and walk through the Activity Log as evidence of zone resilience — no live waiting required.
+The CSA can run the AKS drill (IRMDemoSG5) **before** the customer meeting. Open the web app in a browser tab and keep it open during drill execution. The Activity Log will record the entire drill timeline. During the customer demo, simply open the Infrastructure panel and walk through the Activity Log as evidence of zone resilience — no live waiting required.
 
 ---
 
 #### App B — Inventory Management System (VM-based with ASR)
 
-**Live URL:** http://irm-demo-vm.westus2.cloudapp.azure.com:8080
+**Live URL:** http://zr-inventory-asr.westus2.cloudapp.azure.com:8080
 
 A monolithic inventory management app running on a **zone-pinned VM** (Zone 1) with a companion **worker VM** (data sync agent, also Zone 1). Both VMs are protected by **Azure Site Recovery** with zonal DR (Zone 1 → Zone 2), making them zone-redundant.
 
@@ -168,8 +168,8 @@ graph TB
 > **Pre-created service groups are ready for demo:**
 > | Service Group | App | What's configured |
 > |---|---|---|
-> | **IRMDemoSG2** | AKS-based e-commerce app | Goals + Drill |
-> | **IRMDemoSG3** | VM-based inventory app | Goals + Recovery Plan + Drill |
+> | **IRMDemoSG5** | AKS-based e-commerce app | Goals + Drill |
+> | **IRMDemoSG8** | VM-based inventory app | Goals + Recovery Plan + Drill |
 
 #### Step 1: Start from the At-Scale View
 
@@ -181,9 +181,9 @@ graph TB
    
    > *"This is what a platform team sees when managing dozens of applications — one pane of glass showing which apps meet zone resilience goals and which don't."*
 
-#### Step 2: Drill into IRMDemoSG2 (AKS App)
+#### Step 2: Drill into IRMDemoSG5 (AKS App)
 
-1. Click on the non-resilient service groups tile → select **IRMDemoSG2**
+1. Click on the non-resilient service groups tile → select **IRMDemoSG5**
 2. Show the per-resource breakdown:
    - ✅ AKS Cluster, Load Balancer → Zone-resilient
    - ❌ SQL Database, Storage Account → Non zone-resilient
@@ -191,9 +191,9 @@ graph TB
    - What needs to change
    - Qualitative cost indicator (Low/Medium/High)
 
-#### Step 3: Drill into IRMDemoSG3 (VM App)
+#### Step 3: Drill into IRMDemoSG8 (VM App)
 
-1. Navigate back and select **IRMDemoSG3**
+1. Navigate back and select **IRMDemoSG8**
 2. Show the per-resource breakdown:
    - ✅ VMs with ASR configured → Zone-resilient
    - ❌ SQL Database, Storage → Non zone-resilient
@@ -238,7 +238,7 @@ The most impactful part of the demo — actually simulating a zone failure and v
 
 ---
 
-#### Drill: AKS App (IRMDemoSG2)
+#### Drill: AKS App (IRMDemoSG5)
 
 **Goal:** Prove that the AKS compute layer survives a zone failure.
 
@@ -247,12 +247,12 @@ The most impactful part of the demo — actually simulating a zone failure and v
 **Pre-Demo Drill Execution (Recommended):**
 1. Open the AKS app at http://irm-demo-aks.westus2.cloudapp.azure.com
 2. Click "⚙ Infrastructure" in the navbar to open the Infrastructure panel
-3. Navigate to **IRMDemoSG2 → Resiliency → Drills** in the IRM portal and execute the drill
+3. Navigate to **IRMDemoSG5 → Resiliency → Drills** in the IRM portal and execute the drill
 4. Watch the Activity Log populate in real-time as zones go down and pods reschedule
 5. During the customer demo, open the same browser tab → Infrastructure → Activity Log
 
 **Live Demo Steps (if executing during the meeting):**
-1. Navigate to **IRMDemoSG2 → Resiliency → Drills** (drill already created)
+1. Navigate to **IRMDemoSG5 → Resiliency → Drills** (drill already created)
 2. In the **Fault Designer**, note that:
    - ✅ **AKS Cluster** is included for fault injection (node shutdown in target zone)
    - ⛔ **SQL Database** is **excluded** from the drill (it's non-ZR and would cause expected failures — we're focused on validating what *is* resilient)
@@ -268,14 +268,14 @@ The most impactful part of the demo — actually simulating a zone failure and v
 
 ---
 
-#### Drill: VM App (IRMDemoSG3)
+#### Drill: VM App (IRMDemoSG8)
 
 **Goal:** Prove that the orchestrated recovery plan brings the app back in the correct sequence.
 
-1. Navigate to **IRMDemoSG3 → Resiliency → Drills** (drill + recovery plan pre-created)
+1. Navigate to **IRMDemoSG8 → Resiliency → Drills** (drill + recovery plan pre-created)
 2. **Execute the drill** targeting Zone 1:
    - The VM fault shuts down both VMs in Zone 1
-   - **App goes dark** — http://irm-demo-vm.westus2.cloudapp.azure.com:8080 is completely unreachable
+   - **App goes dark** — http://zr-inventory-asr.westus2.cloudapp.azure.com:8080 is completely unreachable
 3. **Execute the pre-created Recovery Plan** (orchestrated sequence):
    - The recovery plan recovers VMs in the defined order:
      1. **First:** Worker VM fails over to Zone 2 (data sync agent must be ready before the main app)
