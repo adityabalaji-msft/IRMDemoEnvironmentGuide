@@ -168,13 +168,14 @@ The AKS frontend app includes built-in functionality designed for drill demonstr
 | **Azure SQL Database** (both apps) | Enable zone redundancy | Medium | Low — portal toggle, brief disconnect |
 | **Storage Accounts** (both apps) | Convert LRS → ZRS | Low | Medium — may require support request |
 
-**Demo the Copilot "Resolve" feature:**
-1. Select a SQL Database recommendation → click **"Resolve"**
-2. Copilot guides the user step by step:
+**Demo the Resiliency Agent for remediation:**
+1. Open **Azure Copilot → Resiliency Agent**
+2. Prompt the agent: *"Enable zone resiliency for `zr-aks-sql-db`"*
+3. The agent responds with:
    - What can be **fixed in place** (e.g., portal toggle to enable zone redundancy)
    - What needs to be **redeployed via script or automation** (e.g., storage LRS → ZRS conversion)
    - What requires **manual effort** (e.g., architecture changes, support requests)
-3. Prompt the agent to generate an **IaC template** (Bicep) with zone-redundancy enabled — ready to deploy
+4. Prompt the agent to generate an **IaC template** (Bicep) with zone-redundancy enabled — ready to deploy
 
 > **Key talking point:** "IRM doesn't just tell you what's wrong — the agent categorizes each fix by effort and can generate deployment-ready IaC templates with zone-redundancy baked in. For brownfield estates, this is how you close the gap between your current posture and your resiliency goal."
 
