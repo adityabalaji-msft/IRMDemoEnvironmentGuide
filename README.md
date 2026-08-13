@@ -2,7 +2,7 @@
 
 > **Two sample applications deployed to Azure for demonstrating Infrastructure Resiliency Manager (IRM) capabilities to customers.**
 
-This repository contains the source code, infrastructure-as-code, and demo guide for two live applications designed to showcase the end-to-end journey of assessing, remediating, and validating zone resiliency using Infrastructure Resiliency Manager.
+This repository contains the source code, infrastructure-as-code, and demo guide for two live applications designed to showcase the three customer journeys of Azure infrastructure resiliency: **Start Resilient**, **Get Resilient**, and **Stay Resilient**.
 
 ---
 
@@ -11,7 +11,7 @@ This repository contains the source code, infrastructure-as-code, and demo guide
 | Item | Value |
 |---|---|
 | **AKS App URL** | http://irm-demo-aks.westus2.cloudapp.azure.com |
-| **VM App URL** | http://zr-inventory-asr.westus2.cloudapp.azure.com:8080 |
+| **VM App URL** | http://zr-inventory-asr.westus2.cloudapp.azure.com |
 | **AKS Service Group** | `IRMDemoSG5` |
 | **VM Service Group** | `IRMDemoSG8` |
 | **AKS Resource Group** | `zr-demo-rg-4` |
@@ -19,15 +19,57 @@ This repository contains the source code, infrastructure-as-code, and demo guide
 
 ---
 
-## Demo Storyline: "Contoso Retail — From Blind Spots to Validated Zone Resilience"
+## Demo Storyline: "Contoso Retail — Three Customer Journeys to Zone Resilience"
 
-### Act 1 — "Meet the Apps" (Architecture & Current State)
+> **Positioning:** Don't lead with the console — lead with the customer's resiliency moment. Every customer is living in one of three states: deploying something new (Start), hardening what already exists (Get), or keeping a resilient estate from drifting (Stay). The Resiliency Agent and Infrastructure Resiliency Manager meet them wherever they are.
 
-Introduce both live apps by opening them in a browser. Explain what they do and highlight the zone resiliency gaps.
+### Phase 1 — "Start Resilient" (Resilient by Default)
+
+> *"Help me get started with resiliency by default."*
+
+**Customer moment:** Greenfield deployment. The customer is designing a new application or modernizing an existing one. They want to get the architecture right from the outset — not retrofit resilience later.
+
+**What to show:** The **Resiliency Agent** (Azure Copilot) generates a guidance report and deployment-ready IaC templates with zone-redundancy baked in, before a single resource is deployed.
+
+#### Demo Flow: Agent-Led Template Generation
+
+1. Open the **Resiliency Agent** (Azure Copilot → Resiliency)
+2. Describe the application requirements. Example prompt:
+
+   > *"I need to deploy an e-commerce application on AKS in West US 2 with a SQL database for order processing and a storage account for product images. Generate zone-resilient Bicep templates."*
+
+3. **The agent responds with:**
+   - A **guidance report** — which services need zone redundancy and what configurations to set
+   - Modular **Bicep templates** with zone-redundancy baked in:
+     - AKS cluster with zone-redundant node pools across zones 1, 2, 3
+     - Azure SQL Database with zone redundancy enabled
+     - Storage Account configured as ZRS (Zone-Redundant Storage)
+     - Standard Load Balancer with zone-redundant frontend
+   - Cost implications and trade-offs for each resilience choice
+
+4. **Show the generated templates** — the customer leaves with deployment-ready IaC, not a list of recommendations
+
+> **Key talking point:** "The proof point is that you leave this conversation with deployable, resilient-by-default infrastructure-as-code in the tooling you already use — Bicep, Terraform, or ARM templates. Not a list of recommendations to figure out later."
+
+**Why this matters:** Many organizations still use IaC templates that were written before availability zones existed. The Resiliency Agent ensures that new deployments start with the right configuration from day zero — eliminating the need for costly re-architecture later.
 
 ---
 
-#### App A — E-Commerce Platform (AKS Microservices)
+### Phase 2 — "Get Resilient" (Find What Is Critical)
+
+> *"Years of apps on Azure — what is actually critical?"*
+
+**Customer moment:** Brownfield estate. The customer has dozens or hundreds of applications already running in Azure. They need to understand which are truly zone-resilient and which have hidden gaps — then close those gaps efficiently.
+
+**What to show:** Use **Infrastructure Resiliency Manager** to assess posture at scale, drill into specific applications, and use Copilot-powered remediation to close gaps.
+
+---
+
+#### Step 1: Meet the Apps (Architecture & Current State)
+
+Introduce both live apps by opening them in a browser. Explain what they do and highlight the zone resiliency gaps.
+
+##### App A — E-Commerce Platform (AKS Microservices)
 
 **Live URL:** http://irm-demo-aks.westus2.cloudapp.azure.com
 
@@ -78,7 +120,7 @@ graph TB
 
 **What it demonstrates:** The AKS compute layer *looks* resilient — nodes are spread across zones. But the backend dependencies (SQL, Storage) are not zone-redundant. A zone failure could keep compute alive while data services become unreachable.
 
-##### Web App Features (AKS E-Commerce App)
+###### Web App Features (AKS E-Commerce App)
 
 The AKS frontend app includes built-in functionality designed for drill demonstrations:
 
@@ -90,26 +132,11 @@ The AKS frontend app includes built-in functionality designed for drill demonstr
 | **Zone Distribution** | Infrastructure panel | Live 3-zone grid showing healthy/degraded/down/cordoned states per zone (auto-refreshes every 5s) |
 | **Activity Log** | Infrastructure panel (bottom) | Persistent, timestamped log of all zone/pod/node state changes. Survives browser refresh (localStorage). |
 
-**Activity Log captures during a drill:**
-- Zone going down (all pods NOT READY)
-- Node cordoned events
-- Pod terminations and rescheduling to healthy zones
-- Failover detection (traffic sustained on new zone for 3+ consecutive polls)
-- Zone recovery when drill ends
-- Pods scaling back up
+##### App B — Inventory Management System (VM-based with ASR)
 
-**CSA Tip — Pre-Execute the Drill:**
-The CSA can run the AKS drill (IRMDemoSG5) **before** the customer meeting. Open the web app in a browser tab and keep it open during drill execution. The Activity Log will record the entire drill timeline. During the customer demo, simply open the Infrastructure panel and walk through the Activity Log as evidence of zone resilience — no live waiting required.
-
----
-
-#### App B — Inventory Management System (VM-based with ASR)
-
-**Live URL:** http://zr-inventory-asr.westus2.cloudapp.azure.com:8080
+**Live URL:** http://zr-inventory-asr.westus2.cloudapp.azure.com
 
 A monolithic inventory management app running on a **zone-pinned VM** (Zone 1) with a companion **worker VM** (data sync agent, also Zone 1). Both VMs are protected by **Azure Site Recovery** with zonal DR (Zone 1 → Zone 2), making them zone-redundant.
-
-**The challenge** is not *if* recovery can happen, but **how to orchestrate it** — recovering VMs in the correct sequence and validating the app works end-to-end after failover.
 
 ```mermaid
 graph TB
@@ -155,15 +182,13 @@ graph TB
 | Azure SQL Database (GP_Gen5_2) | **Not zone-redundant** | ❌ |
 | Storage Account (Standard_LRS) | **Not zone-redundant** | ❌ |
 
-**What it demonstrates:** The VMs *can* survive a zone failure via ASR, but orchestrating recovery under pressure — in the right order — is the real challenge. Has it ever been tested? Can we prove it works before a real outage?
+**What it demonstrates:** The VMs *can* survive a zone failure via ASR, but orchestrating recovery under pressure — in the right order — is the real challenge.
+
+> **Key talking point:** "The AKS app looks resilient on the surface, but SQL and storage it depends on are not zone-redundant. The VM app has ASR configured, but has it ever been tested? These are brownfield realities — and this is where Infrastructure Resiliency Manager helps you get resilient."
 
 ---
 
-> **Key talking point for Act 1:** "The AKS app looks resilient on the surface — nodes are across zones. But what about the SQL database and storage it depends on? The VM app has ASR configured, so it *can* survive a zone outage — but can the customer actually orchestrate the recovery in the right order under pressure? Has it ever been tested? These are the questions Infrastructure Resiliency Manager answers."
-
----
-
-### Act 2 — "Discover Your Posture at Scale" (Infrastructure Resiliency Manager — Assessment)
+#### Step 2: Assess Posture at Scale
 
 > **Pre-created service groups are ready for demo:**
 > | Service Group | App | What's configured |
@@ -171,132 +196,104 @@ graph TB
 > | **IRMDemoSG5** | AKS-based e-commerce app | Goals + Drill |
 > | **IRMDemoSG8** | VM-based inventory app | Goals + Recovery Plan + Drill |
 
-#### Step 1: Start from the At-Scale View
-
-1. Open the **Infrastructure Resiliency Manager** portal
-2. Navigate to **Resiliency → Resiliency Overview**
-3. Show the **at-scale summary** across all service groups:
-   - Zone-resilient vs. non-resilient service groups
-   - Total resource count broken down by posture
-   
-   > *"This is what a platform team sees when managing dozens of applications — one pane of glass showing which apps meet zone resilience goals and which don't."*
-
-#### Step 2: Drill into IRMDemoSG5 (AKS App)
-
-1. Click on the non-resilient service groups tile → select **IRMDemoSG5**
-2. Show the per-resource breakdown:
+1. Open the **Infrastructure Resiliency Manager** portal → **Resiliency → Resiliency Overview**
+2. Show the **at-scale summary** — zone-resilient vs. non-resilient service groups, total resource count by posture
+   > *"This is what a platform team sees when managing dozens of applications — which apps meet zone resilience goals and which don't."*
+3. **Drill into IRMDemoSG5** (AKS App):
    - ✅ AKS Cluster, Load Balancer → Zone-resilient
    - ❌ SQL Database, Storage Account → Non zone-resilient
-3. Show recommendations auto-generated for each non-resilient resource, including:
-   - What needs to change
-   - Qualitative cost indicator (Low/Medium/High)
-
-#### Step 3: Drill into IRMDemoSG8 (VM App)
-
-1. Navigate back and select **IRMDemoSG8**
-2. Show the per-resource breakdown:
-   - ✅ VMs with ASR configured → Zone-resilient
+   - Show recommendations with cost indicators
+4. **Drill into IRMDemoSG8** (VM App):
+   - ✅ VMs with ASR → Zone-resilient
    - ❌ SQL Database, Storage → Non zone-resilient
-3. Note the **Recovery Plan** already associated for orchestrated failover
+   - Note the **Recovery Plan** already associated for orchestrated failover
 
-#### Step 4: Review Recommendations
-
-For each non-resilient resource, show:
-- Step-by-step remediation guidance
-- Copilot-powered **"Resolve"** feature that generates ready-to-run scripts
-
-> **Key talking point:** "Without this tool, you'd need to manually inspect each resource's zone configuration. With Infrastructure Resiliency Manager, you get a single aggregated view, actionable recommendations with cost implications, and Copilot-generated remediation scripts."
-
----
-
-### Act 3 — "Close the Gaps" (Remediation Guidance)
-
-Walk through how to address the recommendations surfaced in Act 2:
+#### Step 3: Close the Gaps (Copilot-Powered Remediation)
 
 | Resource | Recommendation | Cost Impact | Effort |
 |---|---|---|---|
 | **Azure SQL Database** (both apps) | Enable zone redundancy | Medium | Low — portal toggle, brief disconnect |
 | **Storage Accounts** (both apps) | Convert LRS → ZRS | Low | Medium — may require support request |
 
-
 **Demo the Copilot "Resolve" feature:**
-1. Select a SQL Database recommendation
-2. Click "Resolve" to open the Copilot agent
-3. Copilot guides the user step by step to understand:
+1. Select a SQL Database recommendation → click **"Resolve"**
+2. Copilot guides the user step by step:
    - What can be **fixed in place** (e.g., portal toggle to enable zone redundancy)
-   - What needs to be **redeployed via script or automation** (e.g., storage account LRS → ZRS conversion)
+   - What needs to be **redeployed via script or automation** (e.g., storage LRS → ZRS conversion)
    - What requires **manual effort** (e.g., architecture changes, support requests)
-4. The user can also prompt the agent to generate an **IaC template** (Bicep) with the right resiliency controls already enabled — ready to deploy or integrate into existing pipelines.
+3. Prompt the agent to generate an **IaC template** (Bicep) with zone-redundancy enabled — ready to deploy
 
-> **Key talking point:** "Infrastructure Resiliency Manager doesn't just tell you what's wrong — Copilot walks you through each fix, categorizes the effort, and can even generate deployment-ready IaC templates with zone-redundancy baked in."
-
----
-
-### Act 4 — "Prove It Works" (Zone Down Drills)
-
-The most impactful part of the demo — actually simulating a zone failure and validating recovery.
+> **Key talking point:** "IRM doesn't just tell you what's wrong — the agent categorizes each fix by effort and can generate deployment-ready IaC templates with zone-redundancy baked in. For brownfield estates, this is how you close the gap between your current posture and your resiliency goal."
 
 ---
 
-#### Drill: AKS App (IRMDemoSG5)
+### Phase 3 — "Stay Resilient" (Proactive Drift Resolution)
 
-**Goal:** Prove that the AKS compute layer survives a zone failure.
+> *"New deployment, old template — am I still resilient?"*
 
-> **💡 Recommended:** CSA can execute this drill **before** the customer demo (~30 min ahead). The web app's Activity Log captures the full drill timeline in the browser, providing ready-made evidence to walk through during the meeting.
+**Customer moment:** Steady-state operations. The customer has invested in making their applications zone-resilient. But environments drift — new deployments from old templates, configuration changes, resource additions. How do they keep their estate from silently regressing?
 
-**Pre-Demo Drill Execution (Recommended):**
-1. Open the AKS app at http://irm-demo-aks.westus2.cloudapp.azure.com
-2. Click "⚙ Infrastructure" in the navbar to open the Infrastructure panel
-3. Navigate to **IRMDemoSG5 → Resiliency → Drills** in the IRM portal and execute the drill
-4. Watch the Activity Log populate in real-time as zones go down and pods reschedule
-5. During the customer demo, open the same browser tab → Infrastructure → Activity Log
+**What to show:** Configuration drift detection, compliance drills that validate resilience, and recovery orchestration that proves sequenced recovery works.
 
-**Live Demo Steps (if executing during the meeting):**
+---
+
+#### Step 1: Detect Configuration Drift
+
+1. Navigate to a service group that has been previously assessed
+2. Show how **new deployments or changes are automatically reassessed** — IRM detects when a resource's configuration drifts from the target resiliency state
+3. Demonstrate the drift detection experience:
+   - A resource that was previously zone-resilient now shows as non-compliant
+   - Recommendations guide the customer through approved corrections
+   - The agent can apply course correction immediately
+
+> **Key talking point:** "A new deployment from an outdated template can silently regress your posture. IRM catches this drift automatically and guides you back to compliance — before a real outage exposes the gap."
+
+#### Step 2: Validate with Zone Down Drills
+
+##### AKS Drill (IRMDemoSG5)
+
+**Goal:** Prove that the AKS compute layer survives a zone failure — and generate compliance evidence.
+
+> **CSA Tip:** Execute the drill **before** the customer meeting (~30 min ahead). The web app's Activity Log captures the full drill timeline, providing ready-made evidence to walk through.
+
+**Demo Steps:**
 1. Navigate to **IRMDemoSG5 → Resiliency → Drills** (drill already created)
-2. In the **Fault Designer**, note that:
-   - ✅ **AKS Cluster** is included for fault injection (node shutdown in target zone)
-   - ⛔ **SQL Database** is **excluded** from the drill (it's non-ZR and would cause expected failures — we're focused on validating what *is* resilient)
+2. In the **Fault Designer**, note:
+   - ✅ **AKS Cluster** — included for fault injection (node shutdown in target zone)
+   - ⛔ **SQL Database** — excluded (non-ZR, would cause expected failures)
 3. **Execute the drill** targeting Zone 1:
-   - AKS node pool VMs in Zone 1 get shut down via Chaos Studio
-   - The Load Balancer detects unhealthy nodes and routes traffic to zones 2 and 3
-4. **Open the app** at http://irm-demo-aks.westus2.cloudapp.azure.com — it continues serving because AKS has nodes in other zones. Frontend and backend pods reschedule automatically.
-5. **Show the Activity Log** — click "⚙ Infrastructure" in the web app to see the timestamped record of zone down, pod termination, rescheduling, and failover detection
-6. **Monitor metrics** during the drill — view per-resource health in the drill execution job
-7. **End the drill** — nodes come back, pods rebalance across all zones (Activity Log records the recovery)
+   - AKS node pool VMs in Zone 1 shut down via Chaos Studio
+   - Load Balancer routes traffic to zones 2 and 3
+4. **Open the app** — it continues serving. Show the Activity Log for a timestamped audit trail.
+5. **End the drill** — nodes come back, pods rebalance across all zones
 
-> **Key talking point:** "We excluded the non-resilient SQL DB and focused on validating what we know should survive. The app stayed up because AKS compute is zone-redundant. The Activity Log in the web app gives us a complete audit trail of exactly what happened — zone down, failover, recovery. Next step: make SQL zone-redundant too, then run the full drill."
+> *"We excluded the non-resilient SQL DB and validated what should survive. The app stayed up. The Activity Log provides compliance evidence for audit. Next step: make SQL zone-redundant, then run the full drill."*
 
----
-
-#### Drill: VM App (IRMDemoSG8)
+##### VM Drill (IRMDemoSG8)
 
 **Goal:** Prove that the orchestrated recovery plan brings the app back in the correct sequence.
 
 1. Navigate to **IRMDemoSG8 → Resiliency → Drills** (drill + recovery plan pre-created)
 2. **Execute the drill** targeting Zone 1:
-   - The VM fault shuts down both VMs in Zone 1
-   - **App goes dark** — http://zr-inventory-asr.westus2.cloudapp.azure.com:8080 is completely unreachable
-3. **Execute the pre-created Recovery Plan** (orchestrated sequence):
-   - The recovery plan recovers VMs in the defined order:
-     1. **First:** Worker VM fails over to Zone 2 (data sync agent must be ready before the main app)
-     2. **Then:** Main App VM fails over to Zone 2 (depends on worker being available)
-   - ASR handles disk replication, IP reassignment, and VM boot in Zone 2
-4. **Validate recovery** — The app comes up on the new IP in Zone 2. Check the health endpoint to confirm connectivity to SQL and storage.
-5. After validation, **Reprotect** (Zone 2 → Zone 1) to restore the original configuration for future drills.
+   - Both VMs shut down → **App goes dark**
+3. **Execute the Recovery Plan** (orchestrated sequence):
+   1. **First:** Worker VM fails over to Zone 2 (data sync must be ready first)
+   2. **Then:** Main App VM fails over to Zone 2 (depends on worker)
+   - ASR handles disk replication, IP reassignment, and VM boot
+4. **Validate recovery** — app comes back on Zone 2. Check health endpoint.
+5. **Reprotect** (Zone 2 → Zone 1) to restore for future drills
 
-> **Key talking point:** "This is what makes drills invaluable for VM workloads. ASR gives you the *capability* to recover, but without a tested, orchestrated recovery plan, you're guessing at sequencing under pressure during a real outage. The pre-built recovery plan ensures VMs come up in the right order, every time. And metrics during the drill tell you exactly how long recovery took — your measured RTO."
+> **Key talking point:** "ASR gives you the *capability* to recover. Without a tested, orchestrated recovery plan, you're guessing at sequencing under pressure. The pre-built recovery plan ensures VMs come up in the right order, every time. Drill metrics give you your measured RTO — compliance evidence you can take to an audit."
 
 ---
 
-## Summary: The Customer Journey
+## Summary: Three Customer Journeys
 
-| Demo Act | IRM Capability | Customer Value |
-|---|---|---|
-| **Act 1** — Meet the Apps | Architecture awareness | Understand what you have |
-| **Act 2** — Discover Posture | At-Scale View → Service Group Posture | Single pane of glass across all apps |
-| **Act 3** — Close Gaps | Recommendations + Copilot Scripts | Prioritized, actionable remediation |
-| **Act 4a** — AKS Drill | Zone Down Fault Injection | Validated that zone-spread compute works |
-| **Act 4b** — VM Drill | Orchestrated Recovery Plan | Proven sequenced recovery, measured RTO |
+| Phase | Customer Moment | What We Show | Customer Outcome |
+|---|---|---|---|
+| **Start Resilient** | Greenfield — deploying something new | Resiliency Agent generates guidance report + resilient IaC templates | Deploys resilient from day zero |
+| **Get Resilient** | Brownfield — hardening existing estate | IRM at-scale assessment → per-app drill-down → Copilot remediation + IaC generation | Knows posture, closes gaps with deployment-ready code |
+| **Stay Resilient** | Steady-state — keeping what's resilient from drifting | Config drift detection + compliance drills + recovery orchestration | Catches regression, proves readiness for audits |
 
 ---
 

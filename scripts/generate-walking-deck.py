@@ -102,35 +102,32 @@ add_title_box(slide, "Infrastructure Resiliency Manager", top=Inches(2.0), left=
               font_size=Pt(44), color=WHITE)
 add_title_box(slide, "Field Demo Walking Deck", top=Inches(3.0), left=Inches(1.0),
               font_size=Pt(28), color=LIGHT_BLUE, bold=False)
-add_title_box(slide, "Contoso Retail — From Blind Spots to Validated Zone Resilience",
+add_title_box(slide, "Contoso Retail — Start Resilient, Get Resilient, Stay Resilient",
               top=Inches(4.2), left=Inches(1.0), font_size=Pt(20), color=WHITE, bold=False)
-add_title_box(slide, "Two live apps  •  Four demo acts  •  End-to-end resiliency journey",
+add_title_box(slide, "Three customer journeys  •  Two live apps  •  Agent-led resiliency",
               top=Inches(5.4), left=Inches(1.0), font_size=Pt(16), color=LIGHT_BLUE, bold=False)
 
 add_speaker_note(slide, """Welcome slide. Introduce yourself and set context:
-- "Today I'm going to show you how Infrastructure Resiliency Manager helps you go from blind spots to validated zone resilience."
-- "We have two live applications deployed in Azure — one on AKS, one on VMs — and we'll walk through assessment, remediation, and drills."
+- "Today I'm going to show you how Azure helps you get resilient across three customer journeys — Start Resilient, Get Resilient, and Stay Resilient."
+- "We'll use the Resiliency Agent and Infrastructure Resiliency Manager together, with two live applications deployed in Azure."
 """)
 
 # ============================================================
 # SLIDE 2: Agenda
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Demo Flow", font_size=Pt(36))
-add_body_text(slide, """Act 1 — "Meet the Apps"
-       Architecture & current zone resiliency state
+add_title_box(slide, "Demo Flow — Three Customer Journeys", font_size=Pt(36))
+add_body_text(slide, """Phase 1 — "Start Resilient"
+       Resilient by default: Agent generates guidance + IaC templates
 
-Act 2 — "Discover Your Posture at Scale"
-       IRM assessment: at-scale view → service group drill-down
+Phase 2 — "Get Resilient"
+       Find what is critical: Meet the apps → IRM assessment → Copilot remediation
 
-Act 3 — "Close the Gaps"
-       Copilot-powered remediation guidance + IaC generation
-
-Act 4 — "Prove It Works"
-       Zone down drills: AKS fault injection & VM recovery plan""", font_size=Pt(20))
+Phase 3 — "Stay Resilient"
+       Proactive drift resolution: Config drift detection + compliance drills + recovery orchestration""", font_size=Pt(20))
 
 add_speaker_note(slide, """Agenda overview. Keep this brief — 30 seconds max.
-- "Four acts, each building on the last. We start by understanding the apps, then assess them, fix gaps, and finally prove it all works with live drills."
+"Three phases, each matching a different customer state: deploying something new, hardening existing apps, or keeping a resilient estate from drifting. The Resiliency Agent and IRM meet you wherever you are."
 """)
 
 # ============================================================
@@ -139,43 +136,128 @@ add_speaker_note(slide, """Agenda overview. Keep this brief — 30 seconds max.
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "Quick Reference — Demo Resources")
 add_body_text(slide, """AKS App URL:          http://irm-demo-aks.westus2.cloudapp.azure.com
-VM App URL:           http://irm-demo-vm.westus2.cloudapp.azure.com:8080
+VM App URL:           http://zr-inventory-asr.westus2.cloudapp.azure.com
 
-AKS Service Group:    IRMDemoSG2
-VM Service Group:     IRMDemoSG3
+AKS Service Group:    IRMDemoSG5
+VM Service Group:     IRMDemoSG8
 
 AKS Resource Group:   zr-demo-rg-4
-VM Resource Group:    zr-demo-vm-rg
+VM Resource Group:    zr-demo-vm-asr-rg
 
-Region (AKS):        East US
-Region (VM):         West US 2""", font_size=Pt(18))
+Region:               West US 2""", font_size=Pt(18))
 
 add_speaker_note(slide, """Reference slide — keep visible or memorize key URLs.
-You'll open both app URLs in browser tabs before starting the demo.
-Pre-open the IRM portal and navigate to the service groups list.""")
+Pre-open browser tabs: both app URLs + IRM portal + Resiliency Agent.
+""")
 
 # ============================================================
-# SLIDE 4: Act 1 Title
+# SLIDE 4: Phase 1 Title — Start Resilient
 # ============================================================
 slide = add_slide("", layout_idx=5)
 bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
 bg.fill.solid()
 bg.fill.fore_color.rgb = AZURE_BLUE
 bg.line.fill.background()
-add_title_box(slide, "Act 1", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
-add_title_box(slide, '"Meet the Apps"', top=Inches(3.5), left=Inches(1.0), font_size=Pt(36), color=WHITE, bold=False)
-add_title_box(slide, "Architecture & Current Zone Resiliency State", top=Inches(4.5), left=Inches(1.0),
+add_title_box(slide, "Phase 1", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
+add_title_box(slide, '"Start Resilient"', top=Inches(3.5), left=Inches(1.0), font_size=Pt(36), color=WHITE, bold=False)
+add_title_box(slide, "Resilient by Default — Agent-Led Template Generation", top=Inches(4.5), left=Inches(1.0),
               font_size=Pt(20), color=LIGHT_BLUE, bold=False)
 
-add_speaker_note(slide, """Transition to Act 1.
-"Let me introduce you to two applications that Contoso Retail runs in Azure. Both are live right now."
+add_speaker_note(slide, """Transition to Phase 1.
+"The first customer journey: Start Resilient. This is the greenfield moment — you're deploying something new, and you want to get the architecture right from the outset."
 """)
 
 # ============================================================
-# SLIDE 5: App A — AKS Architecture
+# SLIDE 5: Start Resilient — Customer Voice
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "App A — E-Commerce Platform (AKS Microservices)")
+add_title_box(slide, 'Customer Voice — Start Resilient')
+add_body_text(slide, """"Help me get started with resiliency by default."
+
+Many organizations deploy from IaC templates that were written
+before availability zones even existed.
+
+The result: applications go live without the right resilience
+configurations, and costly re-architecture is needed later.
+
+The Resiliency Agent ensures that new deployments start with
+the right configuration from day zero — eliminating the need
+to retrofit resilience after the fact.
+""", font_size=Pt(22), color=DARK_BLUE)
+
+add_speaker_note(slide, """Set the scene: "This is the customer who is about to deploy something new. Maybe they're modernizing a legacy app, maybe it's a net-new workload. They want to get it right from the start."
+""")
+
+# ============================================================
+# SLIDE 6: Start Resilient — Agent Demo
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "Demo: Resiliency Agent — Guidance Report + IaC Generation")
+add_body_text(slide, """1. Open the Resiliency Agent (Azure Copilot → Resiliency)
+
+2. Describe your application requirements:
+   "I need to deploy an e-commerce app on AKS in West US 2 with
+    a SQL database for orders and a storage account for product
+    images. Generate zone-resilient Bicep templates."
+
+3. The agent responds with:
+   • Guidance report — which services need zone redundancy
+   • Modular Bicep templates with zone redundancy baked in:
+     - AKS: zone-redundant node pools (zones 1, 2, 3)
+     - SQL Database: zone redundancy enabled
+     - Storage Account: ZRS (Zone-Redundant Storage)
+     - Load Balancer: Standard SKU, zone-redundant frontend
+   • Cost implications and trade-offs for each choice
+
+4. Show the generated templates — ready to deploy""", font_size=Pt(17))
+add_action_banner(slide, "▶  SWITCH TO PORTAL → Azure Copilot → Resiliency Agent")
+
+add_speaker_note(slide, """Open the Resiliency Agent in the Azure portal.
+Type the prompt and walk through the agent's response.
+Highlight: the customer leaves with deployable IaC, not a list of recommendations.
+If time allows, show Terraform generation as well.
+"The proof point is that you leave this conversation with deployment-ready code."
+""")
+
+# ============================================================
+# SLIDE 7: Start Resilient — Key Message
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "Key Message — Phase 1")
+add_body_text(slide, """"The proof point is that you leave this conversation
+with deployable, resilient-by-default infrastructure-
+as-code in the tooling you already use — Bicep,
+Terraform, or ARM templates.
+
+Not a list of recommendations to figure out later."
+""", font_size=Pt(24), color=DARK_BLUE)
+
+add_speaker_note(slide, """Let this land. Then transition:
+"But what about the apps you already have running? That's the next journey — Get Resilient."
+""")
+
+# ============================================================
+# SLIDE 8: Phase 2 Title — Get Resilient
+# ============================================================
+slide = add_slide("", layout_idx=5)
+bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
+bg.fill.solid()
+bg.fill.fore_color.rgb = AZURE_BLUE
+bg.line.fill.background()
+add_title_box(slide, "Phase 2", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
+add_title_box(slide, '"Get Resilient"', top=Inches(3.5), left=Inches(1.0),
+              font_size=Pt(36), color=WHITE, bold=False)
+add_title_box(slide, "Find What Is Critical — Assessment, Gaps & Remediation", top=Inches(4.5), left=Inches(1.0),
+              font_size=Pt(20), color=LIGHT_BLUE, bold=False)
+
+add_speaker_note(slide, """Transition: "Now let's talk about the biggest installed base — the apps that are already running in Azure. How do you find what's actually critical and close the gaps?"
+""")
+
+# ============================================================
+# SLIDE 9: App A — AKS Architecture
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "Meet the Apps — App A: E-Commerce Platform (AKS)")
 add_body_text(slide, """• Frontend pods: product catalog + blob storage for static assets
 • Backend pods: order processing via Azure SQL
 • Container images pulled from Azure Container Registry
@@ -192,14 +274,14 @@ add_action_banner(slide, "▶  SWITCH TO BROWSER → Open http://irm-demo-aks.we
 add_speaker_note(slide, """Open the AKS app in browser. Show it's live.
 Key point: "The compute layer looks resilient — nodes across 3 zones. But look at the dependencies:
 SQL and Storage are NOT zone-redundant. If Zone 1 goes down, compute survives but data might not."
-
-Let the audience absorb the gap between perceived and actual resilience.""")
+This is a typical brownfield reality.
+""")
 
 # ============================================================
-# SLIDE 6: App B — VM Architecture
+# SLIDE 10: App B — VM Architecture
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "App B — Inventory Management System (VM + ASR)")
+add_title_box(slide, "Meet the Apps — App B: Inventory Management (VM + ASR)")
 add_body_text(slide, """• Monolithic Node.js app on a zone-pinned VM (Zone 1)
 • Companion worker VM: data sync agent (also Zone 1)
 • Azure Site Recovery: zonal DR (Zone 1 → Zone 2)
@@ -212,58 +294,19 @@ Zone Resiliency Status:
   ✅  ASR Vault (orchestrates zonal failover)
   ❌  Azure SQL Database (GP_Gen5_2 — no ZR)
   ❌  Storage Account (Standard_LRS — no ZR)""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → Open http://irm-demo-vm.westus2.cloudapp.azure.com:8080")
+add_action_banner(slide, "▶  SWITCH TO BROWSER → Open http://zr-inventory-asr.westus2.cloudapp.azure.com")
 
 add_speaker_note(slide, """Open the VM app in browser. Show it's live.
 Key point: "ASR is configured — the VMs CAN recover to Zone 2. But has this ever been tested?
 Can Contoso orchestrate recovery in the right order under real pressure?
-The worker must come up before the main app. That sequencing matters."
-
-Pause: "These are the questions Infrastructure Resiliency Manager answers." """)
-
-# ============================================================
-# SLIDE 7: Act 1 Talking Point
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Key Message — Act 1")
-add_body_text(slide, """"The AKS app looks resilient on the surface — nodes are
-spread across zones. But what about the SQL database and
-storage it depends on?
-
-The VM app has ASR configured, so it CAN survive a zone
-outage — but can the customer actually orchestrate the
-recovery in the right order, under pressure?
-
-Has it ever been tested?
-
-These are the questions Infrastructure Resiliency Manager answers."
-""", font_size=Pt(22), color=DARK_BLUE)
-
-add_speaker_note(slide, """Pause on this slide. Let the message land.
-This frames the rest of the demo — IRM answers these exact questions.""")
+These are brownfield realities — and this is where IRM helps you get resilient."
+""")
 
 # ============================================================
-# SLIDE 8: Act 2 Title
+# SLIDE 11: Get Resilient — At-Scale Assessment
 # ============================================================
 slide = add_slide("", layout_idx=5)
-bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
-bg.fill.solid()
-bg.fill.fore_color.rgb = AZURE_BLUE
-bg.line.fill.background()
-add_title_box(slide, "Act 2", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
-add_title_box(slide, '"Discover Your Posture at Scale"', top=Inches(3.5), left=Inches(1.0),
-              font_size=Pt(36), color=WHITE, bold=False)
-add_title_box(slide, "Infrastructure Resiliency Manager — Assessment", top=Inches(4.5), left=Inches(1.0),
-              font_size=Pt(20), color=LIGHT_BLUE, bold=False)
-
-add_speaker_note(slide, """Transition: "Now let's see what IRM tells us about these applications."
-Switch to the Azure Portal / IRM portal after this slide.""")
-
-# ============================================================
-# SLIDE 9: Act 2 — At-Scale View
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Step 1: At-Scale View")
+add_title_box(slide, "Assess Posture at Scale — IRM Overview")
 add_body_text(slide, """Navigate to:  Resiliency → Resiliency Overview
 
 What to show:
@@ -273,135 +316,51 @@ What to show:
 
 Talking point:
 "This is what a platform team sees when managing dozens of
-applications — one pane of glass showing which apps meet
-zone resilience goals and which don't."
+applications — which apps meet zone resilience goals and
+which don't. No manual inspection required."
 
 Pre-created service groups:
-  • IRMDemoSG2 → AKS app (Goals + Drill)
-  • IRMDemoSG3 → VM app (Goals + Recovery Plan + Drill)""", font_size=Pt(17))
+  • IRMDemoSG5 → AKS app (Goals + Drill)
+  • IRMDemoSG8 → VM app (Goals + Recovery Plan + Drill)""", font_size=Pt(17))
 add_action_banner(slide, "▶  SWITCH TO PORTAL → IRM: Resiliency Overview (at-scale view)")
 
 add_speaker_note(slide, """Switch to portal now. Navigate to Resiliency Overview.
 Point out the non-resilient service groups tile.
-"Imagine you manage 50 applications — you need this single-pane view." """)
+"Imagine you manage 50 applications — you need this view to know where to act."
+""")
 
 # ============================================================
-# SLIDE 10: Act 2 — Drill into SG2 (AKS)
+# SLIDE 12: Get Resilient — Drill into Service Groups
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Step 2: Drill into IRMDemoSG2 (AKS App)")
-add_body_text(slide, """Click on non-resilient tile → select IRMDemoSG2
-
-Per-resource breakdown:
+add_title_box(slide, "Drill into Service Groups — Per-Resource Breakdown")
+add_body_text(slide, """IRMDemoSG5 (AKS App):
   ✅  AKS Cluster, Load Balancer → Zone-resilient
   ❌  SQL Database, Storage Account → Non zone-resilient
+  Recommendations auto-generated with cost indicators
 
-Show recommendations for each non-resilient resource:
-  • What needs to change
-  • Qualitative cost indicator (Low / Medium / High)
-
-Talking point:
-"IRM automatically identifies which resources in this service
-group meet zone resilience requirements and which don't —
-with clear recommendations and cost implications." """, font_size=Pt(17))
-add_action_banner(slide, "▶  STAY IN PORTAL → IRMDemoSG2 service group detail view")
-
-add_speaker_note(slide, """In the portal, click into IRMDemoSG2.
-Walk through the resource list — point to green checkmarks and red X's.
-Click into a recommendation to preview what IRM suggests.""")
-
-# ============================================================
-# SLIDE 11: Act 2 — Drill into SG3 (VM)
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Step 3: Drill into IRMDemoSG3 (VM App)")
-add_body_text(slide, """Navigate back → select IRMDemoSG3
-
-Per-resource breakdown:
+IRMDemoSG8 (VM App):
   ✅  VMs with ASR configured → Zone-resilient
   ❌  SQL Database, Storage → Non zone-resilient
+  Recovery Plan already associated for orchestrated failover
 
-Key differentiator:
-  • Recovery Plan already associated for orchestrated failover
-  • Shows sequencing: Worker first, then Main App
+For each non-resilient resource, show:
+  • Step-by-step remediation guidance
+  • Qualitative cost indicator (Low / Medium / High)""", font_size=Pt(17))
+add_action_banner(slide, "▶  STAY IN PORTAL → Click into IRMDemoSG5, then IRMDemoSG8")
 
-Talking point:
-"Notice the recovery plan here — IRM doesn't just assess
-individual resources, it understands orchestration needs.
-For VMs, sequence matters." """, font_size=Pt(17))
-add_action_banner(slide, "▶  STAY IN PORTAL → IRMDemoSG3 service group detail view")
-
-add_speaker_note(slide, """Click into IRMDemoSG3. Point out the recovery plan section.
-Highlight that ASR + recovery plan = zone-resilient status for VMs.
-"Without the orchestrated plan, even ASR-protected VMs would be flagged." """)
+add_speaker_note(slide, """Walk through both service groups.
+Point to green checkmarks and red X's for each resource.
+Highlight that VM app has a recovery plan — "IRM understands orchestration needs."
+""")
 
 # ============================================================
-# SLIDE 12: Act 2 Key Talking Point
+# SLIDE 13: Get Resilient — Copilot Remediation
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Key Message — Act 2")
-add_body_text(slide, """"Without this tool, you'd need to manually inspect each
-resource's zone configuration — across every subscription,
-every resource group.
-
-With Infrastructure Resiliency Manager, you get:
-
-  • A single aggregated view across all applications
-  • Actionable recommendations with cost implications
-  • Copilot-generated remediation scripts
-
-All in one place."
-""", font_size=Pt(22), color=DARK_BLUE)
-
-add_speaker_note(slide, """Pause slide — let the value proposition sink in.
-Transition: "Now let's look at how we actually fix these gaps." """)
-
-# ============================================================
-# SLIDE 13: Act 3 Title
-# ============================================================
-slide = add_slide("", layout_idx=5)
-bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
-bg.fill.solid()
-bg.fill.fore_color.rgb = AZURE_BLUE
-bg.line.fill.background()
-add_title_box(slide, "Act 3", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
-add_title_box(slide, '"Close the Gaps"', top=Inches(3.5), left=Inches(1.0),
-              font_size=Pt(36), color=WHITE, bold=False)
-add_title_box(slide, "Copilot-Powered Remediation Guidance", top=Inches(4.5), left=Inches(1.0),
-              font_size=Pt(20), color=LIGHT_BLUE, bold=False)
-
-add_speaker_note(slide, """Transition: "IRM told us what's wrong. Now let's fix it."
-Stay in portal for this section — you'll demo the Copilot Resolve feature.""")
-
-# ============================================================
-# SLIDE 14: Act 3 — Recommendations Table
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Recommendations Overview")
-add_body_text(slide, """Resource                    Recommendation              Cost     Effort
-─────────────────────────────────────────────────────────────────────────
-Azure SQL Database          Enable zone redundancy      Medium   Low
-(both apps)                                                      (portal toggle)
-
-Storage Accounts            Convert LRS → ZRS           Low      Medium
-(both apps)                                                      (may need support)
-
-These are surfaced automatically for every non-compliant resource.
-Each includes a qualitative cost indicator so teams can prioritize.""", font_size=Pt(17))
-add_action_banner(slide, "▶  STAY IN PORTAL → Show recommendations list in service group view")
-
-add_speaker_note(slide, """Show the recommendations list in the portal.
-Click on one to expand details. Then proceed to demo Copilot Resolve.""")
-
-# ============================================================
-# SLIDE 15: Act 3 — Copilot Resolve
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, 'Demo: Copilot "Resolve" Feature')
-add_body_text(slide, """1. Select a SQL Database recommendation
-2. Click "Resolve" to open the Copilot agent
-
-Copilot guides the user step by step to understand:
+add_title_box(slide, 'Close the Gaps — Copilot "Resolve" + IaC Generation')
+add_body_text(slide, """1. Select a SQL Database recommendation → click "Resolve"
+2. Copilot guides the user step by step:
 
   • What can be fixed in place
     (e.g., portal toggle to enable zone redundancy)
@@ -412,52 +371,82 @@ Copilot guides the user step by step to understand:
   • What requires manual effort
     (e.g., architecture changes, support requests)
 
-The user can also prompt the agent to generate an IaC template
-(Bicep) with the right resiliency controls already enabled —
-ready to deploy or integrate into existing CI/CD pipelines.""", font_size=Pt(17))
+3. Prompt the agent to generate an IaC template (Bicep) with
+   zone-redundancy enabled — ready to deploy or integrate
+   into existing CI/CD pipelines.""", font_size=Pt(17))
 add_action_banner(slide, "▶  STAY IN PORTAL → Click 'Resolve' on a recommendation")
 
 add_speaker_note(slide, """Click Resolve on the SQL Database recommendation.
-Walk through the Copilot response — show the categorization.
-If time allows, prompt: "Generate a Bicep template with zone redundancy enabled for this SQL database."
-Show the IaC output.""")
+Walk through the Copilot response — show the categorization of fixes.
+If time allows, prompt: "Generate a Bicep template with zone redundancy enabled."
+"The agent categorizes each fix by effort and generates deployment-ready code."
+""")
 
 # ============================================================
-# SLIDE 16: Act 3 Key Talking Point
+# SLIDE 14: Get Resilient — Key Message
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Key Message — Act 3")
-add_body_text(slide, """"Infrastructure Resiliency Manager doesn't just tell you
-what's wrong — Copilot walks you through each fix,
-categorizes the effort, and can even generate
-deployment-ready IaC templates with zone-redundancy
-baked in."
+add_title_box(slide, "Key Message — Phase 2")
+add_body_text(slide, """"For brownfield estates, this is how you close the gap
+between your current posture and your resiliency goal.
+
+IRM doesn't just tell you what's wrong — the agent
+categorizes each fix by effort, generates deployment-
+ready IaC templates, and ranks the top actions worth
+acting on."
 """, font_size=Pt(24), color=DARK_BLUE)
 
 add_speaker_note(slide, """Pause — let value land.
-Transition: "Assessment done. Remediation planned. But how do we PROVE it works?" """)
+Transition: "Assessment done. Gaps closed. But how do we make sure it stays that way?"
+""")
 
 # ============================================================
-# SLIDE 17: Act 4 Title
+# SLIDE 15: Phase 3 Title — Stay Resilient
 # ============================================================
 slide = add_slide("", layout_idx=5)
 bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
 bg.fill.solid()
 bg.fill.fore_color.rgb = AZURE_BLUE
 bg.line.fill.background()
-add_title_box(slide, "Act 4", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
-add_title_box(slide, '"Prove It Works"', top=Inches(3.5), left=Inches(1.0),
+add_title_box(slide, "Phase 3", top=Inches(2.5), left=Inches(1.0), font_size=Pt(52), color=WHITE)
+add_title_box(slide, '"Stay Resilient"', top=Inches(3.5), left=Inches(1.0),
               font_size=Pt(36), color=WHITE, bold=False)
-add_title_box(slide, "Zone Down Drills — Live Fault Injection & Recovery", top=Inches(4.5), left=Inches(1.0),
+add_title_box(slide, "Proactive Drift Resolution — Drift Detection, Drills & Recovery", top=Inches(4.5), left=Inches(1.0),
               font_size=Pt(20), color=LIGHT_BLUE, bold=False)
 
-add_speaker_note(slide, """Transition: "This is the most impactful part of the demo.
-We're going to simulate an actual zone failure and prove our apps survive."
-
-Build anticipation — this is the 'wow' moment.""")
+add_speaker_note(slide, """Transition: "You've invested in making your apps zone-resilient. But environments drift — new deployments from old templates, configuration changes. How do you keep your estate from silently regressing?"
+""")
 
 # ============================================================
-# SLIDE 18: Act 4a — CSA Pre-Demo Drill Option
+# SLIDE 16: Stay Resilient — Config Drift Detection
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "Detect Configuration Drift")
+add_body_text(slide, """The problem:
+  "New deployment, old template — am I still resilient?"
+
+A new deployment from an outdated template can silently regress
+your posture. IRM catches this automatically.
+
+What to show:
+  1. Navigate to a previously assessed service group
+  2. New deployments/changes are automatically reassessed
+  3. A resource that was zone-resilient now shows non-compliant
+  4. Recommendations guide approved corrections
+  5. The agent can apply course correction immediately
+
+Two hooks for the Field:
+  • Drift the customer did not know about
+  • The regulatory calendar — audits require proof""", font_size=Pt(17))
+add_action_banner(slide, "▶  STAY IN PORTAL → Show drift detection in service group posture view")
+
+add_speaker_note(slide, """Show a service group where posture has changed.
+Point out the non-compliant resource and the recommendation.
+"This is the drift you didn't know about. IRM caught it before a real outage did."
+""")
+
+# ============================================================
+# SLIDE 17: Stay Resilient — CSA Pre-Demo Drill Option
 # ============================================================
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "CSA Option: Execute AKS Drill Before the Demo")
@@ -466,10 +455,10 @@ add_body_text(slide, """Recommended: Run the AKS drill BEFORE the customer meeti
 Why?
   • Avoids live wait times during the demo (drills take minutes)
   • The web app's Activity Log captures the full drill timeline
-  • You walk into the meeting with proof already recorded
+  • You walk into the meeting with compliance evidence ready
 
 Steps:
-  1. Navigate to IRMDemoSG2 → Resiliency → Drills
+  1. Navigate to IRMDemoSG5 → Resiliency → Drills
   2. Execute the drill targeting Zone 1
   3. Wait for completion (~5-10 min)
   4. Open the web app → click "Infrastructure" button
@@ -477,27 +466,25 @@ Steps:
 
 During the demo:
   • Open the app and switch to Infrastructure panel
-  • Scroll through the Activity Log — it persists in the browser
-  • "Here's what happened when we simulated a zone failure earlier"
+  • Scroll through the Activity Log as audit evidence
 
 Note: The Activity Log uses browser localStorage — use the same
 browser session you used to observe the drill.""", font_size=Pt(16))
 add_action_banner(slide, "▶  PRE-DEMO: Execute drill, then show Activity Log during customer meeting")
 
 add_speaker_note(slide, """This is the recommended approach for time-constrained demos.
-Run the drill 30 minutes before the meeting.
-Open the AKS app in browser and watch the Infrastructure panel during the drill.
-The Activity Log records all zone/pod/node state changes.
-When you present, just open the same browser tab — the log persists.""")
+Run the drill 30 minutes before the meeting. The Activity Log persists in the browser.
+""")
 
 # ============================================================
-# SLIDE 19: Act 4a — AKS Drill Setup
+# SLIDE 18: Stay Resilient — AKS Drill
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Drill: AKS App (IRMDemoSG2)")
-add_body_text(slide, """Goal: Prove AKS compute layer survives a zone failure
+add_title_box(slide, "Compliance Drill: AKS App (IRMDemoSG5)")
+add_body_text(slide, """Goal: Prove AKS compute survives a zone failure — generate
+compliance evidence
 
-Navigate to: IRMDemoSG2 → Resiliency → Drills (pre-created)
+Navigate to: IRMDemoSG5 → Resiliency → Drills (pre-created)
 
 Fault Designer shows:
   ✅  AKS Cluster — included for fault injection
@@ -505,98 +492,29 @@ Fault Designer shows:
   ⛔  SQL Database — excluded from drill
        (non-ZR, would cause expected failures)
 
-Why exclude SQL?
-"We focus on validating what IS resilient first. Once SQL is
-upgraded to zone-redundant, we'll add it to the drill scope."
-""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO PORTAL → IRMDemoSG2 → Drills → Fault Designer")
+Execute drill targeting Zone 1:
+  1. AKS node pool VMs in Zone 1 shut down
+  2. Load Balancer routes traffic to zones 2 and 3
+  3. Open app URL — it continues serving ✅
+  4. Show Activity Log — timestamped audit trail
+  5. End drill — nodes return, pods rebalance""", font_size=Pt(17))
+add_action_banner(slide, "▶  SWITCH TO PORTAL → IRMDemoSG5 → Drills → Execute")
 
-add_speaker_note(slide, """Navigate to IRMDemoSG2 drills. Show the fault designer.
-Point out which resources are in scope and which are excluded.
-Explain the philosophy: validate what should work, exclude known gaps.""")
-
-# ============================================================
-# SLIDE 20: Act 4a — AKS Drill Execution
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "AKS Drill — Execution & Validation")
-add_body_text(slide, """Execute the drill targeting Zone 1:
-
-1. AKS node pool VMs in Zone 1 shut down (Chaos Studio)
-2. Load Balancer detects unhealthy nodes
-3. Traffic routes to zones 2 and 3 automatically
-4. Pods reschedule to healthy nodes
-
-Validation:
-• Open app URL — it continues serving ✅
-• Click "Infrastructure" in the web app navbar
-• Show the Activity Log — real-time timeline of:
-    - Zone going down, pods terminated, failover detected
-    - Pods rescheduling to healthy zones
-    - Zone recovery after drill ends
-• Monitor per-resource health in drill execution job
-• End drill — nodes return, pods rebalance
-
-Expected result: ZERO downtime for the application""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → App URL → Infrastructure panel → Activity Log")
-
-add_speaker_note(slide, """Execute the drill in portal (or show a pre-recorded execution if time-constrained).
-Switch to browser — show the Infrastructure panel in the web app.
-The Activity Log provides a timestamped record of every zone/pod change.
-This is the 'proof' — the customer can see exactly what happened during the zone failure.
-"The app stayed up because AKS has nodes in other zones. The LB handled rerouting automatically."
-Back to portal to show drill metrics/results.""")
+add_speaker_note(slide, """Execute the drill or show pre-recorded Activity Log.
+"We validated what should survive. The Activity Log provides compliance evidence for audit.
+Next step: make SQL zone-redundant, then run the full drill with all resources in scope."
+""")
 
 # ============================================================
-# SLIDE 20: Act 4a — AKS Key Point
+# SLIDE 19: Stay Resilient — VM Drill
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "AKS Drill — Key Takeaway")
-add_body_text(slide, """"We excluded the non-resilient SQL DB and focused on
-validating what we know should survive.
-
-The app stayed up because AKS compute is zone-redundant.
-
-Next step: make SQL zone-redundant too, then run the
-full drill with all resources in scope."
-""", font_size=Pt(22), color=DARK_BLUE)
-
-add_speaker_note(slide, """Pause. Then transition:
-"Now let's look at the VM scenario — this is more dramatic because the app actually goes DOWN." """)
-
-# ============================================================
-# SLIDE 21: Act 4b — VM Drill Setup
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "Drill: VM App (IRMDemoSG3)")
+add_title_box(slide, "Recovery Orchestration: VM App (IRMDemoSG8)")
 add_body_text(slide, """Goal: Prove the orchestrated recovery plan brings the app
 back in the correct sequence
 
-Navigate to: IRMDemoSG3 → Resiliency → Drills (pre-created)
-
-Key elements:
-  • Drill + Recovery Plan pre-configured
-  • Recovery sequence defined:
-      1st → Worker VM (data sync must be ready first)
-      2nd → Main App VM (depends on worker)
-  • ASR handles: disk replication, IP reassignment, VM boot
-
-What happens when we execute:
-  • Both VMs in Zone 1 shut down
-  • App goes completely dark (unlike AKS!)""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO PORTAL → IRMDemoSG3 → Drills")
-
-add_speaker_note(slide, """Navigate to IRMDemoSG3 drills. Show the recovery plan configuration.
-Point out the sequencing: "Worker first, then main app. Order matters."
-Execute the drill — or narrate what happens if time is tight.""")
-
-# ============================================================
-# SLIDE 22: Act 4b — VM Drill Execution
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "VM Drill — Execution & Recovery")
-add_body_text(slide, """Execute drill targeting Zone 1:
-  → VMs shut down → App goes DARK ❌
+Execute drill targeting Zone 1:
+  → Both VMs shut down → App goes DARK ❌
 
 Execute the Recovery Plan (orchestrated sequence):
   1. Worker VM fails over to Zone 2 (data sync agent ready)
@@ -610,59 +528,58 @@ Validate recovery:
 
 After validation:
   • Reprotect (Zone 2 → Zone 1) for future drills""", font_size=Pt(17))
-add_action_banner(slide, "▶  SWITCH TO BROWSER → Verify app returns at VM URL after recovery")
+add_action_banner(slide, "▶  SWITCH TO PORTAL → IRMDemoSG8 → Drills → Recovery Plan")
 
-add_speaker_note(slide, """This is the dramatic moment — the app actually goes down and comes back.
+add_speaker_note(slide, """This is the dramatic moment — the app goes down and comes back.
 Show the recovery plan executing in portal.
 Switch to browser once recovery completes to show app is live again.
-Highlight the measured RTO in drill results.""")
+"ASR gives you the capability to recover. The recovery plan proves you can do it in the right order.
+Drill metrics give you your measured RTO — compliance evidence for audit."
+""")
 
 # ============================================================
-# SLIDE 23: Act 4b — VM Key Point
-# ============================================================
-slide = add_slide("", layout_idx=5)
-add_title_box(slide, "VM Drill — Key Takeaway")
-add_body_text(slide, """"ASR gives you the CAPABILITY to recover. But without a
-tested, orchestrated recovery plan, you're guessing at
-sequencing under pressure during a real outage.
-
-The pre-built recovery plan ensures VMs come up in the
-right order, every time.
-
-And metrics during the drill tell you exactly how long
-recovery took — your measured RTO."
-""", font_size=Pt(22), color=DARK_BLUE)
-
-add_speaker_note(slide, """Let this land. This is the "aha" moment for VM-heavy customers.
-"How many of your customers have ASR configured but have never tested the actual recovery sequence?" """)
-
-# ============================================================
-# SLIDE 24: Summary
+# SLIDE 20: Stay Resilient — Key Message
 # ============================================================
 slide = add_slide("", layout_idx=5)
-add_title_box(slide, "The Customer Journey — Summary")
-add_body_text(slide, """Demo Act                    IRM Capability                   Customer Value
-──────────────────────────────────────────────────────────────────────────────────
-Act 1 — Meet the Apps       Architecture awareness           Understand what you have
+add_title_box(slide, "Key Message — Phase 3")
+add_body_text(slide, """"Environments drift. New deployments from old templates
+silently regress your posture. IRM catches this
+automatically.
 
-Act 2 — Discover Posture    At-Scale View → SG Posture       Single pane of glass
+Compliance drills generate the evidence auditors need.
+Recovery orchestration proves your team can recover
+in the right order, under pressure.
 
-Act 3 — Close Gaps          Recommendations + Copilot        Prioritized remediation
-                            IaC template generation          with deployment-ready code
+That's how you stay resilient."
+""", font_size=Pt(24), color=DARK_BLUE)
 
-Act 4a — AKS Drill          Zone Down Fault Injection        Validated zone-spread
-                                                             compute works
+add_speaker_note(slide, """Let this land. Then move to summary.
+""")
 
-Act 4b — VM Drill           Orchestrated Recovery Plan       Proven sequenced recovery
-                                                             with measured RTO""", font_size=Pt(16))
+# ============================================================
+# SLIDE 21: Summary — Three Journeys
+# ============================================================
+slide = add_slide("", layout_idx=5)
+add_title_box(slide, "Three Customer Journeys — Summary")
+add_body_text(slide, """Phase              Customer Moment            What We Showed                  Outcome
+───────────────────────────────────────────────────────────────────────────────────────────
+Start Resilient    Greenfield — deploying      Resiliency Agent generates       Deploys resilient
+                   something new               guidance + IaC templates         from day zero
+
+Get Resilient      Brownfield — hardening      IRM at-scale assessment →        Knows posture,
+                   existing estate             drill-down → Copilot remediation closes gaps
+
+Stay Resilient     Steady-state — keeping      Config drift detection +         Catches regression,
+                   what's resilient            compliance drills + recovery     proves readiness
+                   from drifting               orchestration                    for audits""", font_size=Pt(16))
 
 add_speaker_note(slide, """Summary slide — quick recap.
-"We went from understanding the architecture, to assessing posture at scale,
-to getting AI-powered fix guidance, to actually proving it works in production.
-That's the full IRM journey." """)
+"Three journeys. Start right, find what's critical, keep it from drifting.
+The Resiliency Agent and IRM meet the customer wherever they are."
+""")
 
 # ============================================================
-# SLIDE 25: Call to Action
+# SLIDE 22: Call to Action
 # ============================================================
 slide = add_slide("", layout_idx=5)
 bg = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(13.333), Inches(7.5))
@@ -670,37 +587,39 @@ bg.fill.solid()
 bg.fill.fore_color.rgb = DARK_BLUE
 bg.line.fill.background()
 add_title_box(slide, "Next Steps", top=Inches(2.0), left=Inches(1.0), font_size=Pt(40), color=WHITE)
-add_body_text(slide, """• Identify 2-3 critical applications to onboard as Service Groups
+add_body_text(slide, """• Use the Resiliency Agent to generate resilient templates for new deployments
+
+• Identify 2-3 critical applications to onboard as Service Groups
 
 • Run an assessment — see your zone resiliency posture today
 
-• Create your first drill — prove what works, find what doesn't
-
-• Use Copilot to generate remediation templates for gaps""",
+• Create your first drill — prove what works, find what doesn't""",
               top=Inches(3.2), left=Inches(1.0), font_size=Pt(22), color=WHITE)
 add_title_box(slide, "Contact: azureresiliency@microsoft.com", top=Inches(6.2), left=Inches(1.0),
               font_size=Pt(18), color=LIGHT_BLUE, bold=False)
 
 add_speaker_note(slide, """Close with actionable next steps.
-Offer to help them set up their first service group and run their first drill.
-Leave contact info on screen.""")
+Start with the agent (Start Resilient) — lowest friction entry point.
+Then offer to help set up service groups and run their first drill.
+""")
 
 # ============================================================
-# SLIDE 26: Appendix — Pre-Demo Checklist
+# SLIDE 23: Appendix — Pre-Demo Checklist
 # ============================================================
 slide = add_slide("", layout_idx=5)
 add_title_box(slide, "Appendix: Pre-Demo Checklist")
 add_body_text(slide, """Before presenting, verify:
 
   □  AKS app is live: http://irm-demo-aks.westus2.cloudapp.azure.com
-  □  VM app is live: http://irm-demo-vm.westus2.cloudapp.azure.com:8080
-  □  IRM portal loads and shows IRMDemoSG2 + IRMDemoSG3
-  □  Pre-open browser tabs: both app URLs + IRM portal
+  □  VM app is live: http://zr-inventory-asr.westus2.cloudapp.azure.com
+  □  IRM portal loads and shows IRMDemoSG5 + IRMDemoSG8
+  □  Resiliency Agent is accessible (Azure Copilot → Resiliency)
+  □  Pre-open browser tabs: both app URLs + IRM portal + Copilot
   □  ASR replication is healthy (portal → Recovery Services vault)
   □  Drill definitions exist in both service groups
 
 Optional — Execute AKS drill ahead of time:
-  □  Run drill on IRMDemoSG2 (Zone 1 fault) ~30 min before demo
+  □  Run drill on IRMDemoSG5 (Zone 1 fault) ~30 min before demo
   □  Keep the AKS app browser tab open during drill execution
   □  Verify Activity Log captured the drill events (Infrastructure panel)
   □  During demo: open Infrastructure → show Activity Log as evidence
