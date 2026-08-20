@@ -35,6 +35,8 @@ This repository contains the source code, infrastructure-as-code, and demo guide
 
    > *"I need to deploy an e-commerce application on AKS in West US 2 with a SQL database for order processing and a storage account for product images. Generate zone-resilient Bicep templates."*
 
+   **Note:** If the agent asks for a subscription and resource group for the Bicep template, provide subscription ID `c3d3eb0c-9ba7-4d4c-828e-cb6874714034` and resource group name `zr-demo-rg`.
+
 3. **The agent responds with:**
    - A **guidance report** — which services need zone redundancy and what configurations to set
    - Modular **Bicep templates** with zone-redundancy baked in:
