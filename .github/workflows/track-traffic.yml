@@ -1,0 +1,87 @@
+name: Track GitHub Traffic
+
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: traffic-data
+
+      - name: Fetch traffic data
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          mkdir -p data
+
+          # Fetch clones and views
+          curl -sf -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/traffic/clones" > /tmp/clones.json
+
+          curl -sf -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/traffic/views" > /tmp/views.json
+
+          # Merge new daily entries into cumulative file
+          python3 - <<'PYEOF'
+          import json, os
+          from datetime import datetime
+
+          def merge(file, new_data, key):
+              existing = {}
+              if os.path.exists(file):
+                  with open(file) as f:
+                      existing = {e["timestamp"]: e for e in json.load(f)}
+              for entry in new_data.get(key, []):
+                  existing[entry["timestamp"]] = entry
+              merged = sorted(existing.values(), key=lambda x: x["timestamp"])
+              with open(file, "w") as f:
+                  json.dump(merged, f, indent=2)
+              return merged
+
+          with open("/tmp/clones.json") as f:
+              clones_data = json.load(f)
+          with open("/tmp/views.json") as f:
+              views_data = json.load(f)
+
+          clones = merge("data/clones.json", clones_data, "clones")
+          views = merge("data/views.json", views_data, "views")
+
+          total_clones = sum(d["count"] for d in clones)
+          unique_clones = sum(d["uniques"] for d in clones)
+          total_views = sum(d["count"] for d in views)
+          unique_views = sum(d["uniques"] for d in views)
+          first = clones[0]["timestamp"][:10] if clones else "N/A"
+          last = clones[-1]["timestamp"][:10] if clones else "N/A"
+
+          summary = {
+              "updated": datetime.utcnow().isoformat() + "Z",
+              "tracking_since": first,
+              "latest_data": last,
+              "total_clones": total_clones,
+              "unique_cloners": unique_clones,
+              "total_views": total_views,
+              "unique_visitors": unique_views,
+          }
+          with open("data/summary.json", "w") as f:
+              json.dump(summary, f, indent=2)
+
+          print(f"Clones: {total_clones} total, {unique_clones} unique (since {first})")
+          print(f"Views:  {total_views} total, {unique_views} unique (since {first})")
+          PYEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Update traffic data $(date -u +%Y-%m-%d)"
+          git push
