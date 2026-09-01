@@ -163,6 +163,8 @@ The AKS frontend app includes built-in functionality designed for drill demonstr
    - ✅ AKS Cluster, Load Balancer → Zone-resilient
    - ❌ SQL Database, Storage Account → Non zone-resilient
    - Show recommendations with cost indicators
+   - **Availability SLI** → A Service Level Indicator has been created to provide real-time visibility into application availability.
+
 #### Step 3: Close the Gaps (Copilot-Powered Remediation)
 
 | Resource | Recommendation | Cost Impact | Effort |
@@ -220,10 +222,13 @@ The AKS frontend app includes built-in functionality designed for drill demonstr
 3. **Execute the drill** targeting Zone 1:
    - AKS node pool VMs in Zone 1 shut down via Chaos Studio
    - Load Balancer routes traffic to zones 2 and 3
-4. **Open the app** — it continues serving. Show the Activity Log for a timestamped audit trail.
-5. **End the drill** — nodes come back, pods rebalance across all zones
+4. **Monitor the Availability SLI** — open the **Monitor** tab in the service group to observe availability dips and their associated duration while the drill executes.
+5. **Open the app** — it continues serving. Show the Activity Log for a timestamped audit trail.
+6. **End the drill** — nodes come back, pods rebalance across all zones
 
-> *"We excluded the non-resilient SQL DB and validated what should survive. The app stayed up. The Activity Log provides compliance evidence for audit. Next step: make SQL zone-redundant, then run the full drill."*
+> *"We excluded the non-resilient SQL DB and validated what should survive. The app stayed up. The Availability SLI captures any availability dips and their duration, while the Activity Log provides a timestamped audit trail. Next step: make SQL zone-redundant, then run the full drill."*
+
+> **Product note:** Availability SLI monitoring is currently available from the service group's **Monitor** tab. It will be integrated directly into the drills experience and UI in a subsequent release.
 
 **Post-Drill: Rebalancing Pods Across Zones**
 

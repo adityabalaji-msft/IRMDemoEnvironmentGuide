@@ -2,6 +2,8 @@
 
 > This document covers how to deploy and configure the demo scenarios from scratch. For the demo walkthrough, see the main [README.md](README.md).
 
+> **Current demo deployment:** `IRMDemoSG5` corresponds to the Scenario 4 AKS Microservices app. The other scenarios are test applications and have not been deployed.
+
 ---
 
 ## Prerequisites
