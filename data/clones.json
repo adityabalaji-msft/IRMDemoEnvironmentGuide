@@ -208,5 +208,30 @@
     "timestamp": "2026-09-23T00:00:00Z",
     "count": 4,
     "uniques": 4
+  },
+  {
+    "timestamp": "2026-09-24T00:00:00Z",
+    "count": 15,
+    "uniques": 10
+  },
+  {
+    "timestamp": "2026-09-25T00:00:00Z",
+    "count": 3,
+    "uniques": 3
+  },
+  {
+    "timestamp": "2026-09-26T00:00:00Z",
+    "count": 5,
+    "uniques": 5
+  },
+  {
+    "timestamp": "2026-09-27T00:00:00Z",
+    "count": 2,
+    "uniques": 2
+  },
+  {
+    "timestamp": "2026-09-28T00:00:00Z",
+    "count": 13,
+    "uniques": 8
   }
 ]
